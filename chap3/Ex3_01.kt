@@ -1,8 +1,9 @@
-fun main() {
-  val square: (Int) -> Int = { it * it }
-  val triple: (Int) -> Int = { it * 3 }
+fun square(n:  Int) = n * n
 
-  val composed = compose(square, triple)
+fun triple(n: Int) = n * 3
+
+fun main() {
+  val composed = compose(::square, ::triple)
 
   val result = composed(2)
   assert(result == 36)

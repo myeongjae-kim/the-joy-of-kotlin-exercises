@@ -8,7 +8,7 @@ This repository shows the logs of studying Kotlin with [The Joy of Kotlin](https
 
 VSCODE with [Kotlin Language](https://marketplace.visualstudio.com/items?itemName=mathiasfrohlich.Kotlin) and [Code Runner](https://marketplace.visualstudio.com/items?itemName=formulahendry.code-runner) extensions.
 
-Add `-ea` option for .kt files.
+Add `-ea` (enable assertion) option for .kt files.
 ```json
 # settings.json
 {
