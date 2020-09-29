@@ -11,9 +11,9 @@ VSCODE with [Kotlin Language](https://marketplace.visualstudio.com/items?itemNam
 Add `-ea` option for .kt files.
 ```json
 # settings.json
-  ...,
+{
   "code-runner.executorMapByFileExtension": {
-    ...,
     ".kt": "cd $dir && kotlinc $fileName -include-runtime -d $fileNameWithoutExt.jar && java -jar -ea $fileNameWithoutExt.jar"
   }
+}
 ```
