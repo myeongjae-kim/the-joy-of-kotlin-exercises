@@ -152,4 +152,15 @@ class Ch3ExerciseTest {
             assertEquals(func("A", "B", "C", "D"), curried<String, String, String, String>()("A")("B")("C")("D"))
         }
     }
+
+    @Nested
+    inner class Ex10 {
+        private fun <A, B, C> curry(f: (A, B) -> C): (A) -> (B) -> C = { a -> { b -> f(a, b) } }
+        private fun addIntAndDouble(a: Int, b: Double): String = (a + b).toString()
+
+        @Test
+        fun test() {
+            assertEquals(curry(::addIntAndDouble)(1)(2.0), "3.0")
+        }
+    }
 }
