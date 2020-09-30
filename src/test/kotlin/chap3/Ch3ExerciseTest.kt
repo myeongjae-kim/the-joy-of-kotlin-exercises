@@ -163,4 +163,19 @@ class Ch3ExerciseTest {
             assertEquals(curry(::addIntAndDouble)(1)(2.0), "3.0")
         }
     }
+
+    @Nested
+    inner class Ex11 {
+        private fun <T, U, V> swap(curried: (T) -> (U) -> V): (U) -> (T) -> V = {u -> { t -> curried(t)(u)}}
+
+        @Test
+        fun test() {
+            val curried: (Int) -> (Double) -> String = { a -> { b -> (a + b).toString() } }
+
+            val swapped = swap(curried)
+
+            assertEquals(swapped(1.0)(2), "3.0")
+            assertEquals(curried(1)(2.0), "3.0")
+        }
+    }
 }
