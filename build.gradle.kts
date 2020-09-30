@@ -27,6 +27,20 @@ tasks.withType<KotlinCompile>() {
     kotlinOptions.jvmTarget = "11"
 }
 
-tasks.test {
-    useJUnitPlatform()
+tasks.register("ktlintFormatAndCheck") {
+    group = "verification"
+
+    dependsOn(tasks.ktlintKotlinScriptFormat)
+    dependsOn(tasks.ktlintMainSourceSetFormat)
+    dependsOn(tasks.ktlintTestSourceSetFormat)
+
+    doLast {
+        tasks.ktlintCheck.get().run { }
+    }
+}
+
+tasks {
+    test {
+        useJUnitPlatform()
+    }
 }

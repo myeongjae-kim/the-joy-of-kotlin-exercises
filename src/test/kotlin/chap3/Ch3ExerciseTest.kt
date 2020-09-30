@@ -87,13 +87,13 @@ class Ch3ExerciseTest {
         fun test() {
             val square: (Int) -> Int = { it * it }
             val triple: (Int) -> Int = { it * 3 }
-            assert(compose<Int, Int, Int>(square)(triple)(2) == 36)
-            assert(createComposeValueFunction<Int, Int, Int>()(square)(triple)(2) == 36)
+            assertEquals(compose<Int, Int, Int>(square)(triple)(2), 36)
+            assertEquals(createComposeValueFunction<Int, Int, Int>()(square)(triple)(2), 36)
 
             val intToDouble: (Int) -> Double = { it * 1.0 }
             val doubleToString: (Double) -> String = { it.toString() }
-            assert(compose<Int, Double, String>(doubleToString)(intToDouble)(1) == "1.0")
-            assert(createComposeValueFunction<Int, Double, String>()(doubleToString)(intToDouble)(1) == "1.0")
+            assertEquals(compose<Int, Double, String>(doubleToString)(intToDouble)(1), "1.0")
+            assertEquals(createComposeValueFunction<Int, Double, String>()(doubleToString)(intToDouble)(1), "1.0")
         }
     }
 
@@ -106,13 +106,37 @@ class Ch3ExerciseTest {
         fun test() {
             val square: (Int) -> Int = { it * it }
             val triple: (Int) -> Int = { it * 3 }
-            assert(higherCompose<Int, Int, Int>()(square)(triple)(2) == 36)
-            assert(composeAndThen<Int, Int, Int>()(square)(triple)(2) == 12)
+            assertEquals(higherCompose<Int, Int, Int>()(square)(triple)(2), 36)
+            assertEquals(composeAndThen<Int, Int, Int>()(square)(triple)(2), 12)
 
             val intToDouble: (Int) -> Double = { it * 1.0 }
             val doubleToString: (Double) -> String = { it.toString() }
-            assert(higherCompose<Int, Double, String>()(doubleToString)(intToDouble)(1) == "1.0")
-            assert(composeAndThen<Int, Double, String>()(intToDouble)(doubleToString)(1) == "1.0")
+            assertEquals(higherCompose<Int, Double, String>()(doubleToString)(intToDouble)(1), "1.0")
+            assertEquals(composeAndThen<Int, Double, String>()(intToDouble)(doubleToString)(1), "1.0")
+        }
+    }
+
+    @Nested
+    inner class Ex07 {
+        private fun <A, B, C> partialA(a: A, f: (A) -> (B) -> C): (B) -> C = f(a)
+
+        @Test
+        fun test() {
+            val alreadyAdded = partialA<Int, Double, String>(1, { x -> { y -> (x + y).toString() } })
+
+            assertEquals(alreadyAdded(2.0), "3.0")
+        }
+    }
+
+    @Nested
+    inner class Ex08 {
+        private fun <A, B, C> partialA(b: B, f: (A) -> (B) -> C): (A) -> C = { a -> f(a)(b) }
+
+        @Test
+        fun test() {
+            val alreadyAdded = partialA<Int, Double, String>(1.0, { x -> { y -> (x + y).toString() } })
+
+            assertEquals(alreadyAdded(2), "3.0")
         }
     }
 }
