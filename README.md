@@ -6,18 +6,4 @@ This repository shows the logs of studying Kotlin with [The Joy of Kotlin](https
 
 ## Environment
 
-Use VSCODE instead of IntelliJ IDEA to make an environment incomfortable intentionally. It will be good for learning, and also a directory structure is much simpler.
-
-Install VSCODE extensions:
-  - [Kotlin Language](https://marketplace.visualstudio.com/items?itemName=mathiasfrohlich.Kotlin)
-  - [Code Runner](https://marketplace.visualstudio.com/items?itemName=formulahendry.code-runner)
-
-Add `-ea` (enable assertion) option for .kt files.
-```json
-# settings.json
-{
-  "code-runner.executorMapByFileExtension": {
-    ".kt": "cd $dir && kotlinc $fileName -include-runtime -d $fileNameWithoutExt.jar && java -jar -ea $fileNameWithoutExt.jar"
-  }
-}
-```
+Use IntelliJ IDEA and use JUnit to solve exercises.
