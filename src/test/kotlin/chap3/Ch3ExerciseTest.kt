@@ -139,4 +139,17 @@ class Ch3ExerciseTest {
             assertEquals(alreadyAdded(2), "3.0")
         }
     }
+
+    @Nested
+    inner class Ex09 {
+        private fun <A, B, C, D> func(a: A, b: B, c: C, d: D): String = "$a, $b, $c, $d"
+        private fun <A, B, C, D> funcCurried(a: A): (B) -> (C) -> (D) -> String = { b -> { c -> { d -> "$a, $b, $c, $d" } } }
+        private fun <A, B, C, D> curried(): (A) -> (B) -> (C) -> (D) -> String = { a -> { b -> { c -> { d -> "$a, $b, $c, $d" } } } }
+
+        @Test
+        fun test() {
+            assertEquals(func("A", "B", "C", "D"), funcCurried<String, String, String, String>("A")("B")("C")("D"))
+            assertEquals(func("A", "B", "C", "D"), curried<String, String, String, String>()("A")("B")("C")("D"))
+        }
+    }
 }
