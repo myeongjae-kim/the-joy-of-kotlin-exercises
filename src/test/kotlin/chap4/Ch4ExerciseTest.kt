@@ -213,4 +213,30 @@ class Ch4ExerciseTest {
             assertEquals(sum(listOf(1, 2, 3)), 6)
         }
     }
+
+    @Nested
+    inner class Ex06 {
+
+        @Test
+        fun solve() {
+            fun prepend(c: Char, s: String): String = "$c$s"
+
+            fun stringOld(list: List<Char>): String =
+                if (list.isEmpty())
+                    ""
+                else
+                    prepend(list.head(), stringOld(list.tail()))
+
+            fun <T, U> foldRight(list: List<T>, identity: U, operation: (T, U) -> U): U =
+                if (list.isEmpty())
+                    identity
+                else
+                    operation(list.head(), foldRight(list.tail(), identity, operation))
+
+            fun string(list: List<Char>): String = foldRight(list, "", ::prepend)
+
+            assertEquals(stringOld(listOf('a', 'b', 'c')), "abc")
+            assertEquals(string(listOf('a', 'b', 'c')), "abc")
+        }
+    }
 }
