@@ -240,13 +240,27 @@ class Ch4ExerciseTest {
         }
     }
 
-
     @Nested
     inner class Ex07 {
 
         @Test
         fun solve() {
             fun <T> prepend(list: List<T>, elem: T): List<T> = listOf(elem) + list
+
+            fun <T> reverse(list: List<T>): List<T> =
+                foldLeft(list, listOf(), ::prepend)
+
+            assertEquals(reverse(listOf("a", "b", "c")), listOf("c", "b", "a"))
+        }
+    }
+
+    @Nested
+    inner class Ex08 {
+
+        @Test
+        fun solve() {
+            fun <T> prepend(list: List<T>, elem: T): List<T> =
+                foldLeft(list, listOf(elem), {acc, each -> acc + each})
 
             fun <T> reverse(list: List<T>): List<T> =
                 foldLeft(list, listOf(), ::prepend)
