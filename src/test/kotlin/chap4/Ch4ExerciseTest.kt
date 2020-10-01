@@ -183,28 +183,28 @@ class Ch4ExerciseTest {
         }
     }
 
+    fun <T, U> foldLeft(list: List<T>, initial: U, operation: (U, T) -> U): U {
+        tailrec fun foldLeft(list: List<T>, acc: U): U =
+            if (list.isEmpty())
+                acc
+            else
+                foldLeft(list.tail(), operation(acc, list.head()))
+
+        return foldLeft(list, initial)
+    }
+
     @Nested
     inner class Ex05 {
 
         @Test
         fun solve() {
-            fun <T, U> List<T>.foldLeft(initial: U, operation: (U, T) -> U): U {
-                tailrec fun foldLeft(list: List<T>, acc: U): U =
-                    if (list.isEmpty())
-                        acc
-                    else
-                        foldLeft(list.tail(), operation(acc, list.head()))
-
-                return foldLeft(this, initial)
-            }
-
             fun <T> makeString(list: List<T>, delim: String): String = when {
                 list.isEmpty() -> ""
                 list.size == 1 -> "${list[0]}"
-                else -> list.tail().foldLeft("${list.head()}") { a, b -> "$a$delim$b" }
+                else -> foldLeft(list.tail(), "${list.head()}") { a, b -> "$a$delim$b" }
             }
 
-            fun sum(list: List<Int>): Int = list.foldLeft(0, {a, b -> a + b})
+            fun sum(list: List<Int>): Int = foldLeft(list, 0) {a, b -> a + b}
 
             assertEquals(
                 makeString(listOf("one", "two", "three"), ","),
@@ -237,6 +237,21 @@ class Ch4ExerciseTest {
 
             assertEquals(stringOld(listOf('a', 'b', 'c')), "abc")
             assertEquals(string(listOf('a', 'b', 'c')), "abc")
+        }
+    }
+
+
+    @Nested
+    inner class Ex07 {
+
+        @Test
+        fun solve() {
+            fun <T> prepend(list: List<T>, elem: T): List<T> = listOf(elem) + list
+
+            fun <T> reverse(list: List<T>): List<T> =
+                foldLeft(list, listOf(), ::prepend)
+
+            assertEquals(reverse(listOf("a", "b", "c")), listOf("c", "b", "a"))
         }
     }
 }
