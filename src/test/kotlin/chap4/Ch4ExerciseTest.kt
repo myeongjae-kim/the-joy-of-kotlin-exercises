@@ -131,22 +131,24 @@ class Ch4ExerciseTest {
         }
     }
 
+    fun <T> List<T>.head() =
+        if (this.isEmpty())
+            throw IllegalArgumentException("head called on empty list")
+        else
+            this[0]
+
+    fun <T> List<T>.tail() =
+        if (this.isEmpty())
+            throw IllegalArgumentException("tail called on empty list")
+        else
+            this.subList(1, this.size)
+
     @Nested
     inner class Ex04 {
 
         @Test
         fun solve() {
-            fun <T> List<T>.head() =
-                if (this.isEmpty())
-                    throw IllegalArgumentException("head called on empty list")
-                else
-                    this[0]
 
-            fun <T> List<T>.tail() =
-                if (this.isEmpty())
-                    throw IllegalArgumentException("tail called on empty list")
-                else
-                    this.subList(1, this.size)
 
             // my implementation.. some what clumsy
             fun <T> myMakeString(list: List<T>, delim: String): String {
@@ -174,7 +176,41 @@ class Ch4ExerciseTest {
             }
 
             assertEquals(myMakeString(listOf("one", "two", "three"), ","), "one,two,three")
+            assertEquals(myMakeString(emptyList<String>(), ","), "")
+
             assertEquals(makeString(listOf("one", "two", "three"), ","), "one,two,three")
+            assertEquals(makeString(emptyList<String>(), ","), "")
+        }
+    }
+
+    @Nested
+    inner class Ex05 {
+
+        @Test
+        fun solve() {
+            fun <T, U> List<T>.foldLeft(initial: U, operation: (U, T) -> U): U {
+                tailrec fun foldLeft(list: List<T>, acc: U): U =
+                    if (list.isEmpty())
+                        acc
+                    else
+                        foldLeft(list.tail(), operation(acc, list.head()))
+
+                return foldLeft(this, initial)
+            }
+
+            fun <T> makeString(list: List<T>, delim: String): String = when {
+                list.isEmpty() -> ""
+                list.size == 1 -> "${list[0]}"
+                else -> list.tail().foldLeft("${list.head()}") { a, b -> "$a$delim$b" }
+            }
+
+            fun sum(list: List<Int>): Int = list.foldLeft(0, {a, b -> a + b})
+
+            assertEquals(
+                makeString(listOf("one", "two", "three"), ","),
+                "one,two,three")
+
+            assertEquals(sum(listOf(1, 2, 3)), 6)
         }
     }
 }
