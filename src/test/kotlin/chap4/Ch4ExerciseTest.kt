@@ -269,13 +269,13 @@ class Ch4ExerciseTest {
         }
     }
 
+    val inc: (Int) -> Int = { it + 1 }
+
     @Nested
     inner class Ex09 {
 
         @Test
         fun solve() {
-            val inc: (Int) -> Int = { it + 1 }
-
             fun range(start: Int, end:Int): List<Int> {
                 if (start > end)
                     throw IllegalArgumentException("start cannot be bigger than end.")
@@ -293,6 +293,28 @@ class Ch4ExerciseTest {
 
             assertEquals(range(0, 0), emptyList())
             assertEquals(range(0, 10), listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9))
+        }
+    }
+
+    fun <T> unfold(seed: T, f: (T) -> T, p: (T) -> Boolean): List<T> {
+        val mutableList = mutableListOf<T>()
+        var elem = seed
+
+        while(p(elem)) {
+            mutableList.add(elem)
+            elem = f(elem)
+        }
+
+        return mutableList
+    }
+
+    @Nested
+    inner class Ex10 {
+
+        @Test
+        fun solve() {
+            assertEquals(unfold(0, inc) { it < 0 }, emptyList())
+            assertEquals(unfold(0, inc) { it < 10 }, listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9))
         }
     }
 }
