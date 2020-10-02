@@ -484,4 +484,29 @@ class Ch4ExerciseTest {
             assertEquals(iterateAnother(0, inc, 2), listOf(0, 1))
         }
     }
+
+    @Nested
+    inner class Ex17 {
+
+        @Test
+        fun solve() {
+            fun <T,U> map(list: List<T>, f: (T) -> U): List<U> {
+                tailrec fun map(list: List<T>, acc: List<U>): List<U> =
+                    if (list.isEmpty())
+                        acc
+                    else
+                        map(list.tail(), acc + f(list.head()))
+
+                return map(list, listOf())
+            }
+
+            assertEquals(map(listOf(1, 2 ,3), Int::toString), listOf("1", "2", "3"))
+
+            // holy... such a powerful foldLeft(=reduce)
+            fun <T,U> mapReusingFoldLeft(list: List<T>, f: (T) -> U): List<U>
+                = foldLeft(list, listOf()) {acc, elem -> acc + f(elem)}
+
+            assertEquals(mapReusingFoldLeft(listOf(1, 2 ,3), Int::toString), listOf("1", "2", "3"))
+        }
+    }
 }
