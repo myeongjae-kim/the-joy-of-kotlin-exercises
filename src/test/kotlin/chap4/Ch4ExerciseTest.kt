@@ -254,16 +254,15 @@ class Ch4ExerciseTest {
         }
     }
 
+    fun <T> prepend(list: List<T>, elem: T): List<T> =
+        foldLeft(list, listOf(elem), {acc, each -> acc + each})
+
     @Nested
     inner class Ex08 {
 
         @Test
         fun solve() {
-            fun <T> prepend(list: List<T>, elem: T): List<T> =
-                foldLeft(list, listOf(elem), {acc, each -> acc + each})
-
-            fun <T> reverse(list: List<T>): List<T> =
-                foldLeft(list, listOf(), ::prepend)
+            fun <T> reverse(list: List<T>): List<T> = foldLeft(list, listOf(), ::prepend)
 
             assertEquals(reverse(listOf("a", "b", "c")), listOf("c", "b", "a"))
         }
@@ -296,23 +295,23 @@ class Ch4ExerciseTest {
         }
     }
 
-    fun <T> unfold(seed: T, f: (T) -> T, p: (T) -> Boolean): List<T> {
-        val mutableList = mutableListOf<T>()
-        var elem = seed
-
-        while(p(elem)) {
-            mutableList.add(elem)
-            elem = f(elem)
-        }
-
-        return mutableList
-    }
-
     @Nested
     inner class Ex10 {
 
         @Test
         fun solve() {
+            fun <T> unfold(seed: T, f: (T) -> T, p: (T) -> Boolean): List<T> {
+                val mutableList = mutableListOf<T>()
+                var elem = seed
+
+                while(p(elem)) {
+                    mutableList.add(elem)
+                    elem = f(elem)
+                }
+
+                return mutableList
+            }
+
             assertEquals(unfold(0, inc) { it < 0 }, emptyList())
             assertEquals(unfold(0, inc) { it < 10 }, listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9))
         }
@@ -323,6 +322,18 @@ class Ch4ExerciseTest {
 
         @Test
         fun solve() {
+            fun <T> unfold(seed: T, f: (T) -> T, p: (T) -> Boolean): List<T> {
+                val mutableList = mutableListOf<T>()
+                var elem = seed
+
+                while(p(elem)) {
+                    mutableList.add(elem)
+                    elem = f(elem)
+                }
+
+                return mutableList
+            }
+
             fun range(start: Int, end: Int): List<Int> = unfold(start, inc) { it < end }
 
             assertEquals(range(0, 0), emptyList())
@@ -335,9 +346,6 @@ class Ch4ExerciseTest {
 
         @Test
         fun solve() {
-            fun <T> prepend(list: List<T>, elem: T): List<T> =
-                foldLeft(list, listOf(elem), {acc, each -> acc + each})
-
             fun range(start: Int, end: Int): List<Int> = when {
                 start > end -> throw IllegalArgumentException("start cannot be bigger than end.")
                 start == end -> emptyList()
@@ -362,4 +370,19 @@ class Ch4ExerciseTest {
             assertEquals(rangeCorecursive(0, 10), listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9))
         }
     }
+
+    @Nested
+    inner class Ex13 {
+
+        @Test
+        fun solve() {
+            fun <T> unfold(seed: T, f: (T) -> T, p: (T) -> Boolean): List<T> =
+                if (!p(seed)) emptyList()
+                else prepend(unfold(f(seed), f, p), seed)
+
+            assertEquals(unfold(0, inc) { it < 0 }, emptyList())
+            assertEquals(unfold(0, inc) { it < 10 }, listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9))
+        }
+    }
+
 }
