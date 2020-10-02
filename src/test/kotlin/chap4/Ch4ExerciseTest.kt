@@ -385,4 +385,21 @@ class Ch4ExerciseTest {
         }
     }
 
+    @Nested
+    inner class Ex14 {
+
+        @Test
+        fun solve() {
+            fun <T> unfold(seed: T, f: (T) -> T, p: (T) -> Boolean): List<T> {
+                tailrec fun unfold(acc: List<T>, elem: T): List<T> =
+                    if (!p(elem)) acc
+                    else unfold(acc + elem, f(elem))
+
+                return unfold(listOf(), seed)
+            }
+
+            assertEquals(unfold(0, inc) { it < 0 }, emptyList())
+            assertEquals(unfold(0, inc) { it < 10 }, listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9))
+        }
+    }
 }
