@@ -402,4 +402,54 @@ class Ch4ExerciseTest {
             assertEquals(unfold(0, inc) { it < 10 }, listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9))
         }
     }
+
+    @Nested
+    inner class Ex15 {
+
+        @Test
+        fun solve() {
+            // my implementation
+            fun fib(n: Int): String {
+                tailrec fun fib(currentStep: Int, v1: BigInteger, v2: BigInteger, series: String): String =
+                    if (currentStep == n)
+                        series
+                    else
+                        fib(currentStep + 1, v2, v1 + v2, "$series,${v1 + v2}")
+
+                return fib(0, BigInteger.ZERO, BigInteger.ONE, "1")
+            }
+
+            assertEquals(fib(0), "1")
+            assertEquals(fib(1), "1,1")
+            assertEquals(fib(2), "1,1,2")
+            assertEquals(fib(3), "1,1,2,3")
+            assertEquals(fib(4), "1,1,2,3,5")
+            assertEquals(fib(5), "1,1,2,3,5,8")
+
+            // similar to book's implementation
+            fun fibAnother(n: Int): String {
+                tailrec fun fib(currentStep: Int, v1: BigInteger, v2: BigInteger, acc: List<BigInteger>): List<BigInteger> =
+                    if (currentStep == n)
+                        acc
+                    else
+                        fib(currentStep + 1, v2, v1 + v2, acc + (v1 + v2))
+
+                fun <T> makeString(values: List<T>, delim: String): String = when {
+                    values.isEmpty() -> ""
+                    values.tail().isEmpty() -> values.head().toString()
+                    else -> values.head().toString() + foldLeft(values.tail(), "") { a, b -> "$a$delim$b"}
+                }
+
+                return makeString(fib(0, BigInteger.ZERO, BigInteger.ONE, listOf(BigInteger.ONE)), ",")
+            }
+
+            assertEquals(fibAnother(0), "1")
+            assertEquals(fibAnother(1), "1,1")
+            assertEquals(fibAnother(2), "1,1,2")
+            assertEquals(fibAnother(3), "1,1,2,3")
+            assertEquals(fibAnother(4), "1,1,2,3,5")
+            assertEquals(fibAnother(5), "1,1,2,3,5,8")
+        }
+
+    }
 }
