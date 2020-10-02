@@ -276,7 +276,7 @@ class Ch4ExerciseTest {
 
         @Test
         fun solve() {
-            fun range(start: Int, end:Int): List<Int> {
+            fun range(start: Int, end: Int): List<Int> {
                 if (start > end)
                     throw IllegalArgumentException("start cannot be bigger than end.")
 
@@ -315,6 +315,18 @@ class Ch4ExerciseTest {
         fun solve() {
             assertEquals(unfold(0, inc) { it < 0 }, emptyList())
             assertEquals(unfold(0, inc) { it < 10 }, listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9))
+        }
+    }
+
+    @Nested
+    inner class Ex11 {
+
+        @Test
+        fun solve() {
+            fun range(start: Int, end: Int): List<Int> = unfold(start, inc) { it < end }
+
+            assertEquals(range(0, 0), emptyList())
+            assertEquals(range(0, 10), listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9))
         }
     }
 }
