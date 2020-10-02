@@ -329,4 +329,37 @@ class Ch4ExerciseTest {
             assertEquals(range(0, 10), listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9))
         }
     }
+
+    @Nested
+    inner class Ex12 {
+
+        @Test
+        fun solve() {
+            fun <T> prepend(list: List<T>, elem: T): List<T> =
+                foldLeft(list, listOf(elem), {acc, each -> acc + each})
+
+            fun range(start: Int, end: Int): List<Int> = when {
+                start > end -> throw IllegalArgumentException("start cannot be bigger than end.")
+                start == end -> emptyList()
+                else -> prepend(range(start + 1, end), start)
+            }
+
+            fun rangeCorecursive(start: Int, end: Int): List<Int> {
+                tailrec fun rangeCorecursive(acc: List<Int>, elem: Int): List<Int> =
+                    if (elem == end) acc
+                    else rangeCorecursive(acc + elem, elem + 1)
+
+                return if (start > end)
+                    throw IllegalArgumentException("start cannot be bigger than end.")
+                else
+                    rangeCorecursive(emptyList(), start)
+            }
+
+            assertEquals(range(0, 0), emptyList())
+            assertEquals(range(0, 10), listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9))
+
+            assertEquals(rangeCorecursive(0, 0), emptyList())
+            assertEquals(rangeCorecursive(0, 10), listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9))
+        }
+    }
 }
