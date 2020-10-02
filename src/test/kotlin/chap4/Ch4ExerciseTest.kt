@@ -509,4 +509,62 @@ class Ch4ExerciseTest {
             assertEquals(mapReusingFoldLeft(listOf(1, 2 ,3), Int::toString), listOf("1", "2", "3"))
         }
     }
+
+    fun <T> iterate(seed: T, f: (T) -> T, n: Int): List<T> {
+        tailrec fun iterate(acc: List<T>, elem: T, restStep: Int): List<T> =
+            if (restStep == 0) acc
+            else iterate(acc + elem, f(elem), restStep - 1)
+
+        return iterate(listOf(), seed, n)
+    }
+
+    fun <T,U> map(list: List<T>, f: (T) -> U): List<U>
+            = foldLeft(list, listOf()) {acc, elem -> acc + f(elem)}
+
+    fun <T> makeString(values: List<T>, delim: String): String = when {
+        values.isEmpty() -> ""
+        values.tail().isEmpty() -> values.head().toString()
+        else -> values.head().toString() + foldLeft(values.tail(), "") { a, b -> "$a$delim$b"}
+    }
+
+    @Nested
+    inner class Ex18 {
+
+        @Test
+        fun solve() {
+            // my implementation
+            fun fibCorecursive(n: Int): String {
+                fun fib(n: Int): List<Pair<BigInteger, BigInteger>>
+                        = iterate(Pair(BigInteger.ONE, BigInteger.ONE), { Pair(it.second, it.first + it.second) }, n + 1)
+
+                fun fromFibsToString(fibs: List<Pair<BigInteger, BigInteger>>): String
+                        = makeString(map(fibs) { it.first }, ",")
+
+                return fromFibsToString(fib(n))
+            }
+
+            assertEquals(fibCorecursive(0), "1")
+            assertEquals(fibCorecursive(1), "1,1")
+            assertEquals(fibCorecursive(2), "1,1,2")
+            assertEquals(fibCorecursive(3), "1,1,2,3")
+            assertEquals(fibCorecursive(4), "1,1,2,3,5")
+            assertEquals(fibCorecursive(5), "1,1,2,3,5,8")
+
+            // book's implementation
+            fun fibCorecursiveAnother(n: Int): String {
+                val seed = Pair(BigInteger.ONE, BigInteger.ONE)
+                val f = { x: Pair<BigInteger, BigInteger> -> Pair(x.second, x.first + x.second) }
+                val listOfPairs = iterate(seed, f, n + 1)
+                val list = map(listOfPairs) { it.first }
+                return makeString(list, ",")
+            }
+
+            assertEquals(fibCorecursiveAnother(0), "1")
+            assertEquals(fibCorecursiveAnother(1), "1,1")
+            assertEquals(fibCorecursiveAnother(2), "1,1,2")
+            assertEquals(fibCorecursiveAnother(3), "1,1,2,3")
+            assertEquals(fibCorecursiveAnother(4), "1,1,2,3,5")
+            assertEquals(fibCorecursiveAnother(5), "1,1,2,3,5,8")
+        }
+    }
 }
