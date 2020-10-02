@@ -450,6 +450,38 @@ class Ch4ExerciseTest {
             assertEquals(fibAnother(4), "1,1,2,3,5")
             assertEquals(fibAnother(5), "1,1,2,3,5,8")
         }
+    }
 
+    @Nested
+    inner class Ex16 {
+
+        @Test
+        fun solve() {
+            // my implementation
+            fun <T> iterate(seed: T, f: (T) -> T, n: Int): List<T> {
+                tailrec fun iterate(acc: List<T>, elem: T, restStep: Int): List<T> =
+                    if (restStep == 0) acc
+                    else iterate(acc + elem, f(elem), restStep - 1)
+
+                return iterate(listOf(), seed, n)
+            }
+
+            assertEquals(iterate(0, inc, 0), listOf())
+            assertEquals(iterate(0, inc, 1), listOf(0))
+            assertEquals(iterate(0, inc, 2), listOf(0, 1))
+
+            // book's implementation
+            fun <T> iterateAnother(seed: T, f: (T) -> T, n: Int): List<T> {
+                tailrec fun iterateAnother(acc: List<T>, elem: T): List<T> =
+                    if (acc.size < n) iterateAnother(acc + elem, f(elem))
+                    else acc
+
+                return iterateAnother(listOf(), seed)
+            }
+
+            assertEquals(iterateAnother(0, inc, 0), listOf())
+            assertEquals(iterateAnother(0, inc, 1), listOf(0))
+            assertEquals(iterateAnother(0, inc, 2), listOf(0, 1))
+        }
     }
 }
