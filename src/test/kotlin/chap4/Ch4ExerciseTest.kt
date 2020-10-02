@@ -268,4 +268,31 @@ class Ch4ExerciseTest {
             assertEquals(reverse(listOf("a", "b", "c")), listOf("c", "b", "a"))
         }
     }
+
+    @Nested
+    inner class Ex09 {
+
+        @Test
+        fun solve() {
+            val inc: (Int) -> Int = { it + 1 }
+
+            fun range(start: Int, end:Int): List<Int> {
+                if (start > end)
+                    throw IllegalArgumentException("start cannot be bigger than end.")
+
+                val mutableList = mutableListOf<Int>()
+                var elem = start
+
+                while (elem < end) {
+                    mutableList.add(elem)
+                    elem = inc(elem)
+                }
+
+                return mutableList
+            }
+
+            assertEquals(range(0, 0), emptyList())
+            assertEquals(range(0, 10), listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9))
+        }
+    }
 }
