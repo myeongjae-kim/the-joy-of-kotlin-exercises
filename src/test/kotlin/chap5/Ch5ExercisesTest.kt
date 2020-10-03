@@ -50,6 +50,7 @@ class Ch5ExercisesTest {
             Companion.coFoldRight(identity, this.reverse(), identity, f)
 
         fun <B> map(f: (A) -> B) = map(this, f)
+        fun filter(p: (A) -> Boolean) = filter(this, p)
 
         companion object {
 
@@ -128,6 +129,10 @@ class Ch5ExercisesTest {
 
             fun <A, B> map(list: List<A>, f: (A) -> B): List<B> = list.coFoldRight(invoke(), {elem -> {acc -> acc.cons(f(elem))}})
 
+            fun <A> filter(list: List<A>, p: (A) -> Boolean): List<A> = list.coFoldRight(invoke(), {elem -> { acc ->
+                if (p(elem)) acc.cons(elem)
+                else acc
+            }})
         }
     }
 
@@ -395,6 +400,17 @@ class Ch5ExercisesTest {
             assertEquals(
                 List(1.0, 2.0, 3.0).map(Double::toString).toString(),
                 "[1.0, 2.0, 3.0, NIL]")
+        }
+    }
+
+    @Nested
+    inner class Ex19 {
+
+        @Test
+        fun solve() {
+            assertEquals(
+                List(1, 2, 3).filter{ it != 2 }.toString(),
+                "[1, 3, NIL]")
         }
     }
 }
