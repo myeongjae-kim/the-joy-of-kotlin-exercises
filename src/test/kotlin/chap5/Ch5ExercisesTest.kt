@@ -46,6 +46,9 @@ class Ch5ExercisesTest {
         fun <B> foldRightViaFoldLeft(identity: B, f: (A) -> (B) -> B) =
             this.reverse().foldLeft(identity, { b -> { a -> f(a)(b)}})
 
+        fun <B> coFoldRight(identity: B, f: (A) -> (B) -> B): B =
+            Companion.coFoldRight(identity, this.reverse(), identity, f)
+
         companion object {
 
             @Suppress("UNCHECKED_CAST")
@@ -100,6 +103,11 @@ class Ch5ExercisesTest {
             tailrec fun <A, B> foldLeft(acc: B, list: List<A>, f: (B) -> (A) -> B): B = when (list) {
                 Nil -> acc
                 is Cons<A> -> foldLeft(f(acc)(list.head), list.tail, f)
+            }
+
+            private tailrec fun <A, B> coFoldRight(acc: B, list: List<A>, identity: B, f: (A) -> (B) -> B): B = when (list) {
+                Nil -> acc
+                is Cons<A> -> coFoldRight(f(list.head)(acc), list.tail, identity, f)
             }
         }
     }
@@ -276,6 +284,24 @@ class Ch5ExercisesTest {
             assert(
                 list.foldRightViaFoldLeft("") {elem -> { acc -> "$elem, $acc" }}
                         != list.foldLeft("") {elem -> { acc -> "$elem, $acc" }})
+        }
+    }
+
+    @Nested
+    inner class Ex13 {
+
+        @Test
+        fun solve() {
+            val list: List<Int> = List(1, 2, 3)
+            val f: (Int) -> (String) -> String = { elem -> { acc -> "$elem, $acc" }}
+
+            assertEquals(
+                list.foldRight("", f),
+                list.foldRightViaFoldLeft("", f))
+
+            assertEquals(
+                list.foldRightViaFoldLeft("", f),
+                list.coFoldRight("", f))
         }
     }
 }
