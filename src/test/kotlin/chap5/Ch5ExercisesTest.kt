@@ -120,6 +120,9 @@ class Ch5ExercisesTest {
                 Nil -> acc
                 is Cons<A> -> coFoldRight(f(list.head)(acc), list.tail, identity, f)
             }
+
+            fun <A> flatten(lists: List<List<A>>): List<A> =
+                lists.foldLeft(invoke()) { acc -> acc::concat }
         }
     }
 
@@ -335,6 +338,34 @@ class Ch5ExercisesTest {
             assertEquals(
                 List.concatViaFoldRight(list1, list2).toString(),
                 List.concatViaCoFoldRight(list1, list2).toString())
+        }
+    }
+
+    @Nested
+    inner class Ex15 {
+
+        @Test
+        fun solve() {
+            val lists: List<List<Int>> = List(
+                List(1,2),
+                List(3,4),
+                List(5,6)
+            )
+
+            assertEquals(List.flatten(lists).toString(), "[1, 2, 3, 4, 5, 6, NIL]")
+        }
+    }
+
+    @Nested
+    inner class Ex16 {
+
+        @Test
+        fun solve() {
+            fun triple(list: List<Int>): List<Int> = list.foldRight(List()) {elem -> {acc -> acc.cons(elem * 3)}}
+
+            assertEquals(
+                triple(List(1, 2, 3)).toString(),
+                "[3, 6, 9, NIL]")
         }
     }
 }
