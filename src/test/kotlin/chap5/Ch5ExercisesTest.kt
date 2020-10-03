@@ -39,12 +39,12 @@ class Ch5ExercisesTest {
         fun init(): List<A> = init(this)
 
         fun <B> foldRight(identity: B, f: (A) -> (B) -> B) = foldRight(this, identity, f)
-        fun length(): Int = foldLeft(0) { { it + 1} }
+        fun length(): Int = foldLeft(0) {  { _ -> it + 1} }
 
-        fun <B> foldLeft(identity: B, f: (A) -> (B) -> B) = foldLeft(identity, this, f)
+        fun <B> foldLeft(identity: B, f: (B) -> (A) -> B) = foldLeft(identity, this, f)
 
         fun <B> foldRightViaFoldLeft(identity: B, f: (A) -> (B) -> B) =
-            this.reverse().foldLeft(identity, f)
+            this.reverse().foldLeft(identity, { b -> { a -> f(a)(b)}})
 
         companion object {
 
@@ -86,7 +86,7 @@ class Ch5ExercisesTest {
             }
 
             fun <A> reverse(list: List<A>): List<A> =
-                list.foldLeft(invoke(), {elem -> { acc -> acc.cons(elem) }})
+                list.foldLeft(invoke(), { acc -> { elem -> acc.cons(elem) }})
 
             fun <A> init(list: List<A>): List<A> = list.reverse().drop(1).reverse()
 
@@ -97,9 +97,9 @@ class Ch5ExercisesTest {
                 }
             }
 
-            tailrec fun <A, B> foldLeft(acc: B, list: List<A>, f: (A) -> (B) -> B): B = when (list) {
+            tailrec fun <A, B> foldLeft(acc: B, list: List<A>, f: (B) -> (A) -> B): B = when (list) {
                 Nil -> acc
-                is Cons<A> -> foldLeft(f(list.head)(acc), list.tail, f)
+                is Cons<A> -> foldLeft(f(acc)(list.head), list.tail, f)
             }
         }
     }
