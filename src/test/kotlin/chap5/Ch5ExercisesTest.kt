@@ -13,6 +13,9 @@ class Ch5ExercisesTest {
             override fun toString(): String = "[NIL]"
         }
 
+        fun cons(elem: A): List<A> = Cons(elem, this)
+
+        // Cons means Construct.
         private class Cons<A>(
             val head: A,
             val tail: List<A>) : List<A>() {
@@ -36,4 +39,16 @@ class Ch5ExercisesTest {
         }
     }
 
+    @Nested
+    inner class Ex01 {
+
+        @Test
+        fun solve() {
+            val list: List<Int> = List(1, 2, 3)
+            val newList = list.cons(0)
+
+            assertEquals(list.toString(), "[1, 2, 3, NIL]")
+            assertEquals(newList.toString(), "[0, 1, 2, 3, NIL]")
+        }
+    }
 }
