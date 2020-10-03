@@ -49,6 +49,8 @@ class Ch5ExercisesTest {
         fun <B> coFoldRight(identity: B, f: (A) -> (B) -> B): B =
             Companion.coFoldRight(identity, this.reverse(), identity, f)
 
+        fun <B> map(f: (A) -> B) = map(this, f)
+
         companion object {
 
             @Suppress("UNCHECKED_CAST")
@@ -123,6 +125,9 @@ class Ch5ExercisesTest {
 
             fun <A> flatten(lists: List<List<A>>): List<A> =
                 lists.foldLeft(invoke()) { acc -> acc::concat }
+
+            fun <A, B> map(list: List<A>, f: (A) -> B): List<B> = list.coFoldRight(invoke(), {elem -> {acc -> acc.cons(f(elem))}})
+
         }
     }
 
@@ -378,6 +383,17 @@ class Ch5ExercisesTest {
 
             assertEquals(
                 doubleToString(List(1.0, 2.0, 3.0)).toString(),
+                "[1.0, 2.0, 3.0, NIL]")
+        }
+    }
+
+    @Nested
+    inner class Ex18 {
+
+        @Test
+        fun solve() {
+            assertEquals(
+                List(1.0, 2.0, 3.0).map(Double::toString).toString(),
                 "[1.0, 2.0, 3.0, NIL]")
         }
     }
