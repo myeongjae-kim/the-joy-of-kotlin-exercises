@@ -78,6 +78,17 @@ class Ch5ExercisesTest {
                 is Cons -> concat(list1.tail, list2).cons(list1.head)
             }
 
+            // efficient but not stack-safe
+            fun <A> concatViaFoldRight(list1: List<A>, list2: List<A>) : List<A> =
+                list1.foldRight(list2, {elem -> { acc -> acc.cons(elem) }})
+
+            // stack-safe
+            fun <A> concatViaCoFoldRight(list1: List<A>, list2: List<A>) : List<A> =
+                list1.coFoldRight(list2, {elem -> { acc -> acc.cons(elem) }})
+
+            fun <A> concatViaFoldLeft(list1: List<A>, list2: List<A>) : List<A> =
+                list1.reverse().foldLeft(list2, { acc -> { elem -> acc.cons(elem) }})
+
             // my implementation. Not corecursive...
             fun <A> myInit(list: List<A>) : List<A> = when(list) {
                 Nil -> list
@@ -302,6 +313,28 @@ class Ch5ExercisesTest {
             assertEquals(
                 list.foldRightViaFoldLeft("", f),
                 list.coFoldRight("", f))
+        }
+    }
+
+    @Nested
+    inner class Ex14 {
+
+        @Test
+        fun solve() {
+            val list1: List<Int> = List(1, 2, 3)
+            val list2: List<Int> = List(4, 5, 6)
+
+            assertEquals(
+                list1.concat(list2).toString(),
+                List.concatViaFoldLeft(list1, list2).toString())
+
+            assertEquals(
+                List.concatViaFoldLeft(list1, list2).toString(),
+                List.concatViaFoldRight(list1, list2).toString())
+
+            assertEquals(
+                List.concatViaFoldRight(list1, list2).toString(),
+                List.concatViaCoFoldRight(list1, list2).toString())
         }
     }
 }
