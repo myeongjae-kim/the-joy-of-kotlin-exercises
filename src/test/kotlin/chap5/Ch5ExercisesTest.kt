@@ -39,9 +39,12 @@ class Ch5ExercisesTest {
         fun init(): List<A> = init(this)
 
         fun <B> foldRight(identity: B, f: (A) -> (B) -> B) = foldRight(this, identity, f)
-        fun length(): Int = foldLeft(0, { { it + 1} })
+        fun length(): Int = foldLeft(0) { { it + 1} }
 
         fun <B> foldLeft(identity: B, f: (A) -> (B) -> B) = foldLeft(identity, this, f)
+
+        fun <B> foldRightViaFoldLeft(identity: B, f: (A) -> (B) -> B) =
+            this.reverse().foldLeft(identity, f)
 
         companion object {
 
@@ -82,15 +85,8 @@ class Ch5ExercisesTest {
                         Cons(list.head, myInit(list.tail))
             }
 
-            fun <A> reverse(list: List<A>): List<A> {
-                tailrec fun <A> reverse(acc: List<A>, list: List<A>): List<A> = when(list) {
-                    Nil -> acc
-                    is Cons<A> -> reverse(acc.cons(list.head), list.tail)
-                }
-
-                @Suppress("UNCHECKED_CAST")
-                return reverse(invoke(), list)
-            }
+            fun <A> reverse(list: List<A>): List<A> =
+                list.foldLeft(invoke(), {elem -> { acc -> acc.cons(elem) }})
 
             fun <A> init(list: List<A>): List<A> = list.reverse().drop(1).reverse()
 
@@ -250,6 +246,36 @@ class Ch5ExercisesTest {
             assertEquals(sum(List(1, 2, 3)), 6)
             assertEquals(product(List(1.0, 2.0, 3.0)), 6.0)
             assertEquals(List(1, 2, 3).length(), 3)
+        }
+    }
+
+    @Nested
+    inner class Ex11 {
+
+        @Test
+        fun solve() {
+            val list: List<Int> = List(1, 2, 3)
+
+            assertEquals(list.reverse().toString(), "[3, 2, 1, NIL]")
+            assertEquals(list.init().toString(), "[1, 2, NIL]")
+        }
+    }
+
+
+    @Nested
+    inner class Ex12 {
+
+        @Test
+        fun solve() {
+            val list: List<Int> = List(1, 2, 3)
+
+            assertEquals(
+                list.foldRight("") {elem -> { acc -> "$elem, $acc" }},
+                list.foldRightViaFoldLeft("") {elem -> { acc -> "$elem, $acc" }})
+
+            assert(
+                list.foldRightViaFoldLeft("") {elem -> { acc -> "$elem, $acc" }}
+                        != list.foldLeft("") {elem -> { acc -> "$elem, $acc" }})
         }
     }
 }
