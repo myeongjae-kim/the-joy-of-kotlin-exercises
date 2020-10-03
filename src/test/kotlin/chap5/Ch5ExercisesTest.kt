@@ -2,6 +2,7 @@ package chap5
 
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import java.lang.RuntimeException
 import kotlin.test.assertEquals
 
 class Ch5ExercisesTest {
@@ -12,8 +13,6 @@ class Ch5ExercisesTest {
             override fun isEmpty(): Boolean = true
             override fun toString(): String = "[NIL]"
         }
-
-        fun cons(elem: A): List<A> = Cons(elem, this)
 
         // Cons means Construct.
         private class Cons<A>(
@@ -28,6 +27,12 @@ class Ch5ExercisesTest {
                 is Nil -> acc
                 is Cons -> toString("$acc${list.head}, ", list.tail)
             }
+        }
+
+        fun cons(elem: A): List<A> = Cons(elem, this)
+        fun setHead(elem: A) : List<A> = when(this) {
+            Nil -> throw RuntimeException("cannot setHead of empty list.")
+            is Cons -> tail.cons(elem)
         }
 
         companion object {
@@ -49,6 +54,19 @@ class Ch5ExercisesTest {
 
             assertEquals(list.toString(), "[1, 2, 3, NIL]")
             assertEquals(newList.toString(), "[0, 1, 2, 3, NIL]")
+        }
+    }
+
+    @Nested
+    inner class Ex02 {
+
+        @Test
+        fun solve() {
+            val list: List<Int> = List(1, 2, 3)
+            val newList = list.setHead(0)
+
+            assertEquals(list.toString(), "[1, 2, 3, NIL]")
+            assertEquals(newList.toString(), "[0, 2, 3, NIL]")
         }
     }
 }
