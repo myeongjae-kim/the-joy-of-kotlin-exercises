@@ -2,20 +2,21 @@ package chap5
 
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import java.lang.IllegalArgumentException
 import java.lang.RuntimeException
 import kotlin.test.assertEquals
 
 class Ch5ExercisesTest {
-    sealed class List<A> {
+    internal sealed class List<A> {
         abstract fun isEmpty(): Boolean
 
-        private object Nil : List<Nothing>() {
+        internal object Nil : List<Nothing>() {
             override fun isEmpty(): Boolean = true
             override fun toString(): String = "[NIL]"
         }
 
         // Cons means Construct.
-        private class Cons<A>(
+        internal class Cons<A>(
             val head: A,
             val tail: List<A>) : List<A>() {
 
@@ -36,6 +37,9 @@ class Ch5ExercisesTest {
         fun concat(list: List<A>): List<A> = concat(this, list)
         fun reverse(): List<A> = reverse(this)
         fun init(): List<A> = init(this)
+
+        fun head(): A = head(this)
+        fun tail(): List<A> = tail(this)
 
         companion object {
 
@@ -87,6 +91,16 @@ class Ch5ExercisesTest {
             }
 
             fun <A> init(list: List<A>): List<A> = list.reverse().drop(1).reverse()
+
+            fun <A> head(list: List<A>): A = when(list) {
+                Nil -> throw IllegalArgumentException("No head for empty list.")
+                is Cons<A> -> list.head
+            }
+
+            fun <A> tail(list: List<A>): List<A> = when(list) {
+                Nil -> list
+                is Cons<A> -> list.tail
+            }
         }
     }
 
@@ -171,6 +185,25 @@ class Ch5ExercisesTest {
             assertEquals(list.reverse().toString(), "[3, 2, 1, NIL]")
             assertEquals(list.init().toString(), "[1, 2, NIL]")
             assertEquals(List.myInit(list).toString(), "[1, 2, NIL]")
+        }
+    }
+
+    @Nested
+    inner class Ex06 {
+        private fun sum(ints: List<out Int>): Int {
+            tailrec fun sum(acc: Int, ints: List<out Int>): Int = when (ints) {
+                List.Nil -> acc
+                is List.Cons -> sum(acc + ints.head, ints.tail)
+            }
+
+            return sum(0, ints)
+        }
+
+        @Test
+        fun solve() {
+            val list = List(1, 2, 3)
+
+            assertEquals(sum(list), 6)
         }
     }
 }
