@@ -32,6 +32,7 @@ class Ch5ExercisesTest {
         fun cons(elem: A): List<A> = cons(this, elem)
         fun setHead(elem: A) : List<A> = setHead(this, elem)
         fun drop(n: Int): List<A> = drop(this, n)
+        fun dropWhile(p: (A) -> Boolean): List<A> = dropWhile(this, p)
 
         companion object {
 
@@ -48,8 +49,13 @@ class Ch5ExercisesTest {
             }
 
             tailrec fun <A> drop(list: List<A>, n: Int): List<A> = if (n == 0) list else when (list) {
-                is Nil -> list
+                Nil -> list
                 is Cons<A> -> drop(list.tail, n - 1)
+            }
+
+            tailrec fun <A> dropWhile(list: List<A>, p: (A) -> Boolean): List<A> = when (list) {
+                Nil -> list
+                is Cons -> if (p(list.head)) dropWhile(list.tail, p) else list
             }
         }
     }
@@ -93,6 +99,22 @@ class Ch5ExercisesTest {
 
             assertEquals(list.drop(100).toString(), "[NIL]")
             assertEquals(List.drop(list, 100).toString(), "[NIL]")
+        }
+    }
+
+    @Nested
+    inner class Ex04 {
+
+        @Test
+        fun solve() {
+            val list: List<Int> = List(1, 2, 3)
+
+            assertEquals(list.toString(), "[1, 2, 3, NIL]")
+            assertEquals(list.dropWhile { it != 3 }.toString(), "[3, NIL]")
+            assertEquals(List.dropWhile(list) { it != 3 }.toString(), "[3, NIL]")
+
+            assertEquals(list.dropWhile { it != 100 }.toString(), "[NIL]")
+            assertEquals(List.dropWhile(list) { it != 100 }.toString(), "[NIL]")
         }
     }
 }
