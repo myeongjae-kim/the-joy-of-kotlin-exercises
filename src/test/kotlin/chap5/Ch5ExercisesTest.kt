@@ -34,6 +34,8 @@ class Ch5ExercisesTest {
         fun drop(n: Int): List<A> = drop(this, n)
         fun dropWhile(p: (A) -> Boolean): List<A> = dropWhile(this, p)
         fun concat(list: List<A>): List<A> = concat(this, list)
+        fun reverse(): List<A> = reverse(this)
+        fun init(): List<A> = init(this)
 
         companion object {
 
@@ -63,6 +65,28 @@ class Ch5ExercisesTest {
                 Nil -> list2
                 is Cons -> concat(list1.tail, list2).cons(list1.head)
             }
+
+            // my implementation. Not corecursive...
+            fun <A> myInit(list: List<A>) : List<A> = when(list) {
+                Nil -> list
+                is Cons<A> ->
+                    if (list.tail == Nil)
+                        list.tail
+                    else
+                        Cons(list.head, myInit(list.tail))
+            }
+
+            fun <A> reverse(list: List<A>): List<A> {
+                tailrec fun <A> reverse(acc: List<A>, list: List<A>): List<A> = when(list) {
+                    Nil -> acc
+                    is Cons<A> -> reverse(acc.cons(list.head), list.tail)
+                }
+
+                @Suppress("UNCHECKED_CAST")
+                return reverse(invoke(), list)
+            }
+
+            fun <A> init(list: List<A>): List<A> = list.reverse().drop(1).reverse()
         }
     }
 
@@ -134,6 +158,19 @@ class Ch5ExercisesTest {
 
             assertEquals(list1.concat(list2).toString(), "[1, 2, 3, 4, 5, 6, NIL]")
             assertEquals(List.concat(list1, list2).toString(), "[1, 2, 3, 4, 5, 6, NIL]")
+        }
+    }
+
+    @Nested
+    inner class Ex05 {
+
+        @Test
+        fun solve() {
+            val list: List<Int> = List(1, 2, 3)
+
+            assertEquals(list.reverse().toString(), "[3, 2, 1, NIL]")
+            assertEquals(list.init().toString(), "[1, 2, NIL]")
+            assertEquals(List.myInit(list).toString(), "[1, 2, NIL]")
         }
     }
 }
