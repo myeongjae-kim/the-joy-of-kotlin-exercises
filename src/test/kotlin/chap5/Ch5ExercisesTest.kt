@@ -33,6 +33,7 @@ class Ch5ExercisesTest {
         fun setHead(elem: A) : List<A> = setHead(this, elem)
         fun drop(n: Int): List<A> = drop(this, n)
         fun dropWhile(p: (A) -> Boolean): List<A> = dropWhile(this, p)
+        fun concat(list: List<A>): List<A> = concat(this, list)
 
         companion object {
 
@@ -56,6 +57,11 @@ class Ch5ExercisesTest {
             tailrec fun <A> dropWhile(list: List<A>, p: (A) -> Boolean): List<A> = when (list) {
                 Nil -> list
                 is Cons -> if (p(list.head)) dropWhile(list.tail, p) else list
+            }
+
+            fun <A> concat(list1: List<A>, list2: List<A>) : List<A> = when (list1) {
+                Nil -> list2
+                is Cons -> concat(list1.tail, list2).cons(list1.head)
             }
         }
     }
@@ -115,6 +121,19 @@ class Ch5ExercisesTest {
 
             assertEquals(list.dropWhile { it != 100 }.toString(), "[NIL]")
             assertEquals(List.dropWhile(list) { it != 100 }.toString(), "[NIL]")
+        }
+    }
+
+    @Nested
+    inner class Concat {
+
+        @Test
+        fun solve() {
+            val list1: List<Int> = List(1, 2, 3)
+            val list2: List<Int> = List(4, 5, 6)
+
+            assertEquals(list1.concat(list2).toString(), "[1, 2, 3, 4, 5, 6, NIL]")
+            assertEquals(List.concat(list1, list2).toString(), "[1, 2, 3, 4, 5, 6, NIL]")
         }
     }
 }
