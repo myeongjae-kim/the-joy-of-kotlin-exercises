@@ -52,6 +52,7 @@ class Ch5ExercisesTest {
         fun <B> map(f: (A) -> B) = map(this, f)
         fun filter(p: (A) -> Boolean) = filter(this, p)
         fun <B> flatMap(f: (A) -> List<B>) = flatMap(this, f)
+        fun filterViaFlatMap(p: (A) -> Boolean) = filterViaFlatMap(this, p)
 
         companion object {
 
@@ -136,6 +137,9 @@ class Ch5ExercisesTest {
             }})
 
             fun <A, B> flatMap(list: List<A>, f: (A) -> List<B>): List<B> = flatten(list.map(f))
+
+            fun <A> filterViaFlatMap(list: List<A>, p: (A) -> Boolean): List<A> =
+                list.flatMap { if (p(it)) List(it) else invoke() }
         }
     }
 
@@ -425,6 +429,17 @@ class Ch5ExercisesTest {
             assertEquals(
                 List(1, 2, 3).flatMap{ i -> List(i, -i) }.toString(),
                 "[1, -1, 2, -2, 3, -3, NIL]")
+        }
+    }
+
+    @Nested
+    inner class Ex21 {
+
+        @Test
+        fun solve() {
+            assertEquals(
+                List(1, 2, 3).filterViaFlatMap{ it != 2 }.toString(),
+                "[1, 3, NIL]")
         }
     }
 }
