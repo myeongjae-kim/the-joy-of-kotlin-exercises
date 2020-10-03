@@ -37,9 +37,8 @@ class Ch5ExercisesTest {
         fun concat(list: List<A>): List<A> = concat(this, list)
         fun reverse(): List<A> = reverse(this)
         fun init(): List<A> = init(this)
-
-        fun head(): A = head(this)
-        fun tail(): List<A> = tail(this)
+        fun <B> foldRight(identity: B, f: (A) -> (B) -> B) = foldRight(this, identity, f)
+        fun length(): Int = foldRight(0, { { it + 1} })
 
         companion object {
 
@@ -92,14 +91,11 @@ class Ch5ExercisesTest {
 
             fun <A> init(list: List<A>): List<A> = list.reverse().drop(1).reverse()
 
-            fun <A> head(list: List<A>): A = when(list) {
-                Nil -> throw IllegalArgumentException("No head for empty list.")
-                is Cons<A> -> list.head
-            }
-
-            fun <A> tail(list: List<A>): List<A> = when(list) {
-                Nil -> list
-                is Cons<A> -> list.tail
+            fun <A, B> foldRight(list: List<A>, identity: B, f: (A) -> (B) -> B): B {
+                return when (list) {
+                    Nil -> identity
+                    is Cons<A> -> f(list.head)(foldRight(list.tail, identity, f))
+                }
             }
         }
     }
@@ -204,6 +200,34 @@ class Ch5ExercisesTest {
             val list = List(1, 2, 3)
 
             assertEquals(sum(list), 6)
+        }
+    }
+
+    @Nested
+    inner class Ex07 {
+        private fun product(doubles: List<out Double>): Double {
+            tailrec fun product(acc: Double, ints: List<out Double>): Double = when (ints) {
+                List.Nil -> acc
+                is List.Cons -> product(acc * ints.head, ints.tail)
+            }
+
+            return product(1.0, doubles)
+        }
+
+        @Test
+        fun solve() {
+            val list = List(1.0, 2.0, 3.0)
+
+            assertEquals(product(list).toString(), "6.0")
+        }
+    }
+
+    @Nested
+    inner class Ex08 {
+
+        @Test
+        fun solve() {
+            assertEquals(List("a", "b", "c").length(), 3)
         }
     }
 }
