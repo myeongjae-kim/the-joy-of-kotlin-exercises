@@ -29,32 +29,9 @@ class Ch5ExercisesTest {
             }
         }
 
-        fun cons(elem: A): List<A> = Cons(elem, this)
-
-        fun setHead(elem: A) : List<A> = when(this) {
-            Nil -> throw RuntimeException("cannot setHead of empty list.")
-            is Cons -> tail.cons(elem)
-        }
-
-        fun drop(n: Int): List<A> {
-
-            // my implementation
-            @Suppress("UNCHECKED_CAST")
-            tailrec fun myDrop(list: List<A>, n: Int): List<A> = when {
-                list is Nil -> Nil as List<A>
-                n <= 0 -> list
-                else -> myDrop((list as Cons<A>).tail, n - 1)
-            }
-
-            // book's implementation
-            tailrec fun drop(n: Int, list: List<A>): List<A> =
-                if (n <= 0) list else when(list) {
-                    is Nil -> list
-                    is Cons -> drop(n - 1, list.tail)
-                }
-
-            return drop(n, this)
-        }
+        fun cons(elem: A): List<A> = cons(this, elem)
+        fun setHead(elem: A) : List<A> = setHead(this, elem)
+        fun drop(n: Int): List<A> = drop(this, n)
 
         companion object {
 
@@ -62,6 +39,18 @@ class Ch5ExercisesTest {
             operator
             fun <A> invoke(vararg az: A): List<A> =
                 az.foldRight(Nil as List<A>, {elem, acc -> Cons(elem, acc)})
+
+            fun <A> cons(list: List<A>, elem: A): List<A> = Cons(elem, list)
+
+            fun <A> setHead(list: List<A>, elem: A) : List<A> = when(list) {
+                Nil -> throw RuntimeException("cannot setHead of empty list.")
+                is Cons -> list.tail.cons(elem)
+            }
+
+            tailrec fun <A> drop(list: List<A>, n: Int): List<A> = if (n == 0) list else when (list) {
+                is Nil -> list
+                is Cons<A> -> drop(list.tail, n - 1)
+            }
         }
     }
 
@@ -71,10 +60,10 @@ class Ch5ExercisesTest {
         @Test
         fun solve() {
             val list: List<Int> = List(1, 2, 3)
-            val newList = list.cons(0)
 
             assertEquals(list.toString(), "[1, 2, 3, NIL]")
-            assertEquals(newList.toString(), "[0, 1, 2, 3, NIL]")
+            assertEquals(list.cons(0).toString(), "[0, 1, 2, 3, NIL]")
+            assertEquals(List.cons(list, 0).toString(), "[0, 1, 2, 3, NIL]")
         }
     }
 
@@ -84,10 +73,10 @@ class Ch5ExercisesTest {
         @Test
         fun solve() {
             val list: List<Int> = List(1, 2, 3)
-            val newList = list.setHead(0)
 
             assertEquals(list.toString(), "[1, 2, 3, NIL]")
-            assertEquals(newList.toString(), "[0, 2, 3, NIL]")
+            assertEquals(list.setHead(0).toString(), "[0, 2, 3, NIL]")
+            assertEquals(List.setHead(list, 0).toString(), "[0, 2, 3, NIL]")
         }
     }
 
@@ -97,11 +86,13 @@ class Ch5ExercisesTest {
         @Test
         fun solve() {
             val list: List<Int> = List(1, 2, 3)
-            val newList = list.drop(2)
 
             assertEquals(list.toString(), "[1, 2, 3, NIL]")
-            assertEquals(newList.toString(), "[3, NIL]")
+            assertEquals(list.drop(2).toString(), "[3, NIL]")
+            assertEquals(List.drop(list, 2).toString(), "[3, NIL]")
+
             assertEquals(list.drop(100).toString(), "[NIL]")
+            assertEquals(List.drop(list, 100).toString(), "[NIL]")
         }
     }
 }
