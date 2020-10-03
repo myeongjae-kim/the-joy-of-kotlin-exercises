@@ -93,7 +93,7 @@ class Ch5ExercisesTest {
             fun <A> concatViaFoldLeft(list1: List<A>, list2: List<A>) : List<A> =
                 list1.reverse().foldLeft(list2, { acc -> { elem -> acc.cons(elem) }})
 
-            // my implementation. Not corecursive...
+            // my implementation. Not corecursive and not reusing objects...
             fun <A> myInit(list: List<A>) : List<A> = when(list) {
                 Nil -> list
                 is Cons<A> ->
