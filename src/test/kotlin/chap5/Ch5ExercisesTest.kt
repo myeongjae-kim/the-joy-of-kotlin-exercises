@@ -39,7 +39,7 @@ class Ch5ExercisesTest {
         fun init(): List<A> = init(this)
 
         fun <B> foldRight(identity: B, f: (A) -> (B) -> B) = foldRight(this, identity, f)
-        fun length(): Int = foldRight(0, { { it + 1} })
+        fun length(): Int = foldLeft(0, { { it + 1} })
 
         fun <B> foldLeft(identity: B, f: (A) -> (B) -> B) = foldLeft(identity, this, f)
 
@@ -236,6 +236,20 @@ class Ch5ExercisesTest {
         @Test
         fun solve() {
             assertEquals(List("a", "b", "c").length(), 3)
+        }
+    }
+
+    @Nested
+    inner class Ex10 {
+
+        @Test
+        fun solve() {
+            fun sum(list: List<Int>): Int = list.foldLeft(0, {x -> {y -> x + y}})
+            fun product(list: List<Double>): Double = list.foldLeft(1.0, {x -> {y -> x * y}})
+
+            assertEquals(sum(List(1, 2, 3)), 6)
+            assertEquals(product(List(1.0, 2.0, 3.0)), 6.0)
+            assertEquals(List(1, 2, 3).length(), 3)
         }
     }
 }
