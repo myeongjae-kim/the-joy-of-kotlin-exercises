@@ -37,8 +37,11 @@ class Ch5ExercisesTest {
         fun concat(list: List<A>): List<A> = concat(this, list)
         fun reverse(): List<A> = reverse(this)
         fun init(): List<A> = init(this)
+
         fun <B> foldRight(identity: B, f: (A) -> (B) -> B) = foldRight(this, identity, f)
         fun length(): Int = foldRight(0, { { it + 1} })
+
+        fun <B> foldLeft(identity: B, f: (A) -> (B) -> B) = foldLeft(identity, this, f)
 
         companion object {
 
@@ -96,6 +99,11 @@ class Ch5ExercisesTest {
                     Nil -> identity
                     is Cons<A> -> f(list.head)(foldRight(list.tail, identity, f))
                 }
+            }
+
+            tailrec fun <A, B> foldLeft(acc: B, list: List<A>, f: (A) -> (B) -> B): B = when (list) {
+                Nil -> acc
+                is Cons<A> -> foldLeft(f(list.head)(acc), list.tail, f)
             }
         }
     }
