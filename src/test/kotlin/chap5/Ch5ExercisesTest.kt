@@ -368,4 +368,17 @@ class Ch5ExercisesTest {
                 "[3, 6, 9, NIL]")
         }
     }
+
+    @Nested
+    inner class Ex17 {
+
+        @Test
+        fun solve() {
+            fun doubleToString(list: List<Double>): List<String> = list.foldRight(List()) {elem -> {acc -> acc.cons(elem.toString())}}
+
+            assertEquals(
+                doubleToString(List(1.0, 2.0, 3.0)).toString(),
+                "[1.0, 2.0, 3.0, NIL]")
+        }
+    }
 }
