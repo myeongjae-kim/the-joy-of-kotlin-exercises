@@ -24,6 +24,8 @@ class Ch6ExercisesTest {
             is Some -> this.value
         }
 
+        fun <B> flatMap(f: (A) -> Option<B>): Option<B> = this.map(f).getOrElse(None)
+
         internal object None: Option<Nothing>() {
 
             override fun isEmpty(): Boolean = true
@@ -35,7 +37,6 @@ class Ch6ExercisesTest {
             override fun hashCode(): Int = 0
 
             override fun <B> map(f: (Nothing) -> B): Option<B> = None
-
         }
 
         internal data class Some<out A>(internal val value: A): Option<A>() {
@@ -86,6 +87,18 @@ class Ch6ExercisesTest {
         fun solve() {
             assertEquals(Option<Double>().map(Double::toString), Option())
             assertEquals(Option(1.0).map(Double::toString).getOrElse { throw RuntimeException() }, "1.0")
+        }
+    }
+
+    @Nested
+    inner class Ex04 {
+
+        @Test
+        fun solve() {
+            val f: (Double) -> Option<String> = { it -> Option(it.toString()) }
+
+            assertEquals(Option(1.0).flatMap(f).getOrElse(""), "1.0")
+            assertEquals(Option<Double>().flatMap(f).getOrElse(""), "")
         }
     }
 }
