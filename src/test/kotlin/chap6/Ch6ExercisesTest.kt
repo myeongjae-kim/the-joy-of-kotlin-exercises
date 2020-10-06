@@ -12,6 +12,8 @@ class Ch6ExercisesTest {
 
         abstract fun isEmpty(): Boolean
 
+        abstract fun <B> map(f: (A) -> B): Option<B>
+
         fun getOrElse(default: @UnsafeVariance A): A = when(this) {
             None -> default
             is Some -> this.value
@@ -32,11 +34,15 @@ class Ch6ExercisesTest {
 
             override fun hashCode(): Int = 0
 
+            override fun <B> map(f: (Nothing) -> B): Option<B> = None
+
         }
 
         internal data class Some<out A>(internal val value: A): Option<A>() {
 
             override fun isEmpty() = false
+
+            override fun <B> map(f: (A) -> B): Option<B> = Some(f(this.value))
         }
 
         companion object {
@@ -70,6 +76,16 @@ class Ch6ExercisesTest {
 
             val exception = assertThrows<RuntimeException> { max(listOf<Int>()).getOrElse(::getDefault) }
             assertEquals(exception.javaClass, RuntimeException::class.java)
+        }
+    }
+
+    @Nested
+    inner class Ex03 {
+
+        @Test
+        fun solve() {
+            assertEquals(Option<Double>().map(Double::toString), Option())
+            assertEquals(Option(1.0).map(Double::toString).getOrElse { throw RuntimeException() }, "1.0")
         }
     }
 }
