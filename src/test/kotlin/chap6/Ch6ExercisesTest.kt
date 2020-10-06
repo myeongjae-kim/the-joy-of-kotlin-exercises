@@ -26,6 +26,8 @@ class Ch6ExercisesTest {
 
         fun <B> flatMap(f: (A) -> Option<B>): Option<B> = this.map(f).getOrElse(None)
 
+        fun orElse(default: () -> Option<@UnsafeVariance A>): Option<A> = map { this }.getOrElse(default)
+
         internal object None: Option<Nothing>() {
 
             override fun isEmpty(): Boolean = true
@@ -99,6 +101,16 @@ class Ch6ExercisesTest {
 
             assertEquals(Option(1.0).flatMap(f).getOrElse(""), "1.0")
             assertEquals(Option<Double>().flatMap(f).getOrElse(""), "")
+        }
+    }
+
+    @Nested
+    inner class Ex05 {
+
+        @Test
+        fun solve() {
+            assertEquals(Option(1.0).orElse { Option(0.0) }.getOrElse(-1.0).toString(), "1.0")
+            assertEquals(Option<Double>().orElse { Option(0.0) }.getOrElse(-1.0).toString(), "0.0")
         }
     }
 }
