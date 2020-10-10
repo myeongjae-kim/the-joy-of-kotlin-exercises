@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.lang.RuntimeException
+import kotlin.math.pow
 import kotlin.test.assertEquals
 
 class Ch6ExercisesTest {
@@ -123,6 +124,36 @@ class Ch6ExercisesTest {
         fun solve() {
             assertEquals(Option(1).filter { it == 1 }.getOrElse(0), 1)
             assertEquals(Option(1).filter { it != 1 }.getOrElse(0), 0)
+        }
+    }
+
+    @Nested
+    inner class Ex07 {
+        // my implementation
+        val myVariance: (List<Double>) -> Option<Double> = {
+            Option(it)
+                    .filter { l -> l.isNotEmpty() }
+                    .map { l -> l.sum() / l.size }
+                    .map { m -> it.fold(0.0, {acc, x -> (x - m).pow(2.0) + acc}) / it.size }
+        }
+
+        // book's implementation
+        val mean: (List<Double>) -> Option<Double> = { list ->
+            when {
+                list.isEmpty() -> Option()
+                else -> Option(list.sum() / list.size)
+            }
+        }
+
+        val variance: (List<Double>) -> Option<Double> = { list ->
+            mean(list).flatMap { m ->
+                mean(list.map { x -> (x - m).pow(2) })
+            }
+        }
+
+        @Test
+        fun solve() {
+            assertEquals(myVariance(listOf(1.0, 2.0, 3.0)), variance(listOf(1.0, 2.0, 3.0)))
         }
     }
 }
