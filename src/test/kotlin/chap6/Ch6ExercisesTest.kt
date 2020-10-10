@@ -156,4 +156,21 @@ class Ch6ExercisesTest {
             assertEquals(myVariance(listOf(1.0, 2.0, 3.0)), variance(listOf(1.0, 2.0, 3.0)))
         }
     }
+
+    fun <A, B> lift(f: (A) -> B): (Option<A>) -> Option<B> = { it.map(f) }
+
+    @Nested
+    inner class Ex08 {
+
+        @Test
+        fun solve() {
+            val f: (Int) -> String = { it.toString() }
+            val lifted = lift(f)
+
+            val a = Option(1)
+            val b = lifted(a)
+
+            assertEquals(b.getOrElse(""), "1")
+        }
+    }
 }
