@@ -6,7 +6,7 @@ import java.lang.RuntimeException
 import kotlin.test.assertEquals
 
 class Ch5ExercisesTest {
-    internal sealed class List<A> {
+    sealed class List<A> {
         abstract fun isEmpty(): Boolean
 
         internal object Nil : List<Nothing>() {
