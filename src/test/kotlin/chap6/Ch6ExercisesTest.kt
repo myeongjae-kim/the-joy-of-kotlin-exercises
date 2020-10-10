@@ -236,16 +236,7 @@ class Ch6ExercisesTest {
         }
     }
 
-    // None의 map을 호출하면 map의 매개변수에 어떤 함수가 들어오든지 상관없이 함수를 호출하지 않고 None객체가 다시 나온다.
-    // 따라서 아래 매개변수 list에 하나라도 None객체가 있으면 결과가 None이 된다.
-    fun <A> sequence(list: List<Option<A>>): Option<List<A>> =
-            list.foldRight(Option(List())) { x ->
-                { y: Option<List<A>> ->
-                    map2(x, y) { a ->
-                        { b: List<A> -> b.cons(a) }
-                    }
-                }
-            }
+    fun <A> sequence(list: List<Option<A>>): Option<List<A>> = traverse(list) { it }
 
     @Nested
     inner class Ex11 {
@@ -260,5 +251,31 @@ class Ch6ExercisesTest {
         }
     }
 
+    // None의 map을 호출하면 map의 매개변수에 어떤 함수가 들어오든지 상관없이 함수를 호출하지 않고 None객체가 다시 나온다.
+    // 따라서 아래 매개변수 list에 하나라도 None객체가 있으면 결과가 None이 된다.
+    fun <A, B> traverse(list: List<A>, f: (A) -> Option<B>): Option<List<B>> =
+            list.foldRight(Option(List())) { x ->
+                { y: Option<List<B>> ->
+                    map2(f(x), y) { a ->
+                        { b: List<B> -> b.cons(a) }
+                    }
+                }
+            }
+
+    // 돌겠네.. Ex11, Ex12 어려움.
+    @Nested
+    inner class Ex12 {
+
+        @Test
+        fun solve() {
+            val list1 = List(Option(1), Option(2), Option(3))
+            val list2 = List(Option(1), Option(), Option(3))
+
+            val f: (Option<Int>) -> Option<Int> = { elem -> elem.map { it + 10 } }
+
+            assertEquals(traverse(list1, f).getOrElse { throw RuntimeException() }.toString(), "[11, 12, 13, NIL]")
+            assertEquals(traverse(list2, f), Option())
+        }
+    }
 
 }
