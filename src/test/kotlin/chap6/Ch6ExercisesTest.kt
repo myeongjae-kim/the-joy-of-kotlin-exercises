@@ -157,7 +157,13 @@ class Ch6ExercisesTest {
         }
     }
 
-    fun <A, B> lift(f: (A) -> B): (Option<A>) -> Option<B> = { it.map(f) }
+    fun <A, B> lift(f: (A) -> B): (Option<A>) -> Option<B> = {
+        try {
+            it.map(f)
+        } catch (e: Exception) {
+            Option()
+        }
+    }
 
     @Nested
     inner class Ex08 {
@@ -171,6 +177,21 @@ class Ch6ExercisesTest {
             val b = lifted(a)
 
             assertEquals(b.getOrElse(""), "1")
+        }
+    }
+
+    @Nested
+    inner class Ex09 {
+
+        @Test
+        fun solve() {
+            val f: (Int) -> String = { throw RuntimeException() }
+            val lifted = lift(f)
+
+            val a = Option(1)
+            val b = lifted(a)
+
+            assertEquals(b.getOrElse(""), "")
         }
     }
 }
