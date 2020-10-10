@@ -194,4 +194,41 @@ class Ch6ExercisesTest {
             assertEquals(b.getOrElse(""), "")
         }
     }
+
+    @Nested
+    inner class Ex10 {
+
+        @Test
+        fun solve() {
+            fun <A, B, C> myMap2(a: Option<A>, b: Option<B>, f: (A) -> (B) -> C): Option<C> =
+                    a.map(f).flatMap { b.map(it) }
+
+            // 매개변수들을 closure로 몽땅 잡은 다음에 가장 안쪽에 있는 함수에서 f를 콜한다.
+            // 함수형 프로그래밍의 전형적인 패턴.
+            // 이런식으로 작성하면 map3, map4 등도 쉽게 작성 가능함
+            fun <A, B, C> map2(oa: Option<A>, ob: Option<B>, f: (A) -> (B) -> C): Option<C> =
+                    oa.flatMap { a -> ob.map { b -> f(a)(b) } }
+
+            fun <A, B, C, D> map3(
+                    oa: Option<A>,
+                    ob: Option<B>,
+                    oc: Option<C>,
+                    f: (A) -> (B) -> (C) -> D
+            ): Option<D> = oa.flatMap { a -> ob.flatMap { b -> oc.map { c -> f(a)(b)(c) } } }
+
+            fun <A, B, C, D, E> map4(
+                    oa: Option<A>,
+                    ob: Option<B>,
+                    oc: Option<C>,
+                    od: Option<D>,
+                    f: (A) -> (B) -> (C) -> (D) -> E
+            ): Option<E> = oa.flatMap { a -> ob.flatMap { b -> oc.flatMap { c -> od.map { d -> f(a)(b)(c)(d) } } } }
+
+            val a: Option<Int> = Option(1)
+            val b: Option<Double> = Option(2.0)
+            val f: (Int) -> (Double) -> String = {x -> {y -> (x + y).toString() }}
+
+            assertEquals(map2(a, b, f).getOrElse(""), "3.0")
+        }
+    }
 }
