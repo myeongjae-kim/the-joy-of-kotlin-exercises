@@ -163,6 +163,8 @@ class Ch7ExercisesTest {
         fun filter(p: (A) -> Boolean): Result<A> {
             return filter(p, "Condition not matched")
         }
+
+        fun exists(p: (A) -> Boolean): Boolean = map(p).getOrElse(false) // alternative:  filter(p) is Success
     }
 
     @Nested
@@ -212,6 +214,19 @@ class Ch7ExercisesTest {
 
             assertEquals(i1.filter(p).toString(), "Success(1)")
             assertEquals(i2.filter(p).toString(), "Failure(Condition not matched)")
+        }
+    }
+
+    @Nested
+    inner class Ex06 {
+        @Test
+        fun solve() {
+            val i1 = Result(1)
+            val i2 = Result(2)
+            val p: (Int) -> Boolean = { it == 1 }
+
+            assertEquals(i1.exists(p), true)
+            assertEquals(i2.exists(p), false)
         }
     }
 }
