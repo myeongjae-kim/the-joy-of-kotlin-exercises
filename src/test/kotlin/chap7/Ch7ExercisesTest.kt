@@ -3,8 +3,8 @@ package chap7
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.io.Serializable
-import java.lang.IllegalStateException
 import java.lang.RuntimeException
+import kotlin.IllegalStateException
 import kotlin.test.assertEquals
 
 class Ch7ExercisesTest {
@@ -140,6 +140,24 @@ class Ch7ExercisesTest {
                 null -> Failure(NullPointerException())
                 else -> Success(a)
             }
+
+            operator fun <A> invoke(a: A? = null, message: String): Result<A> = when(a) {
+                null -> Failure(NullPointerException(message))
+                else -> Success(a)
+            }
+
+            operator fun <A> invoke(a: A? = null, p: (A) -> Boolean): Result<A> = when(a) {
+                null -> Failure(NullPointerException())
+                else -> if (p(a)) Success(a) else Empty
+            }
+
+            operator fun <A> invoke(a: A? = null, message: String, p: (A) -> Boolean): Result<A> = when(a) {
+                null -> Failure(NullPointerException(message))
+                else -> when {
+                    (p(a)) -> Success(a)
+                    else -> Failure(IllegalStateException("Argument $a does not match condition: $message"))
+                }
+            }
         }
 
         fun <A> failure(message: String): Result<A> = Failure(IllegalStateException(message))
@@ -249,6 +267,22 @@ class Ch7ExercisesTest {
 
             assertEquals(i1.filter(p).mapFailure("what").toString(), "Success(1)")
             assertEquals(i2.filter(p).mapFailure("what").toString(), "Failure(what)")
+        }
+    }
+
+    @Nested
+    inner class Ex08 {
+        @Test
+        fun solve() {
+            val success = Result(1) { it == 1 }
+            val empty = Result(1) { it == 2 }
+            val failure1 = Result(null, "what")
+            val failure2 = Result(1, "what") { it == 2 }
+
+            assertEquals(success.toString(), "Success(1)")
+            assertEquals(empty.toString(), "Empty")
+            assertEquals(failure1.toString(), "Failure(what)")
+            assertEquals(failure2.toString(), "Failure(Argument 1 does not match condition: what)")
         }
     }
 }
