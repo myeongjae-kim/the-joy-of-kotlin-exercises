@@ -91,6 +91,10 @@ class Ch7ExercisesTest {
         abstract fun<B> flatMap(f: (A) -> Result<B>): Result<B>
         abstract fun mapFailure(message: String): Result<A>
         abstract fun forEach(effect: (A) -> Unit)
+        abstract fun forEachOrElse(
+                onSuccess: (A) -> Unit,
+                onFailure: (RuntimeException) -> Unit,
+                onEmpty: () -> Unit)
 
         internal object Empty: Result<Nothing>() {
             override fun toString(): String = "Empty"
@@ -102,6 +106,14 @@ class Ch7ExercisesTest {
             override fun mapFailure(message: String): Result<Nothing> = this
 
             override fun forEach(effect: (Nothing) -> Unit) { }
+
+            override fun forEachOrElse(
+                    onSuccess: (Nothing) -> Unit,
+                    onFailure: (RuntimeException) -> Unit,
+                    onEmpty: () -> Unit
+            ) {
+                onEmpty()
+            }
         }
 
         internal class Failure<out A>(internal val exception: RuntimeException): Result<A>() {
@@ -114,6 +126,14 @@ class Ch7ExercisesTest {
             override fun mapFailure(message: String): Result<A> = Failure(RuntimeException(message, exception))
 
             override fun forEach(effect: (A) -> Unit) { }
+
+            override fun forEachOrElse(
+                    onSuccess: (A) -> Unit,
+                    onFailure: (RuntimeException) -> Unit,
+                    onEmpty: () -> Unit
+            ) {
+                onFailure(this.exception)
+            }
         }
 
         internal class Success<out A>(internal val value: A): Result<A>() {
@@ -138,6 +158,14 @@ class Ch7ExercisesTest {
             override fun mapFailure(message: String): Result<A> = this
 
             override fun forEach(effect: (A) -> Unit) { effect(this.value) }
+
+            override fun forEachOrElse(
+                    onSuccess: (A) -> Unit,
+                    onFailure: (RuntimeException) -> Unit,
+                    onEmpty: () -> Unit
+            ) {
+                onSuccess(this.value)
+            }
         }
 
         companion object {
@@ -310,6 +338,38 @@ class Ch7ExercisesTest {
             empty.forEach { throw RuntimeException() }
             failure1.forEach { throw RuntimeException() }
             failure2.forEach { throw RuntimeException() }
+        }
+    }
+
+    @Nested
+    inner class Ex10 {
+        @Test
+        fun solve() {
+            val success = Result(1) { it == 1 }
+            val empty = Result(1) { it == 2 }
+            val failure1 = Result(null, "what")
+            val failure2 = Result(1, "what") { it == 2 }
+
+            val onSuccess: (Int) -> Unit = {
+                assertEquals(it, 1)
+            }
+
+            val onEmpty: () -> Unit = {
+                println("it is empty")
+            }
+
+            val onFailure1: (RuntimeException) -> Unit = {
+                assert(it is NullPointerException)
+            }
+
+            val onFailure2: (RuntimeException) -> Unit = {
+                assert(it is IllegalStateException)
+            }
+
+            success.forEachOrElse(onSuccess, onFailure1, onEmpty)
+            empty.forEachOrElse(onSuccess, onFailure1, onEmpty)
+            failure1.forEachOrElse(onSuccess, onFailure1, onEmpty)
+            failure2.forEachOrElse(onSuccess, onFailure2, onEmpty)
         }
     }
 }
