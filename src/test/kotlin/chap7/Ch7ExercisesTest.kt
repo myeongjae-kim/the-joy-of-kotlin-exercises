@@ -3,8 +3,8 @@ package chap7
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.io.Serializable
-import java.lang.RuntimeException
 import kotlin.IllegalStateException
+import kotlin.RuntimeException
 import kotlin.test.assertEquals
 
 class Ch7ExercisesTest {
@@ -90,6 +90,7 @@ class Ch7ExercisesTest {
         abstract fun<B> map(f: (A) -> B): Result<B>
         abstract fun<B> flatMap(f: (A) -> Result<B>): Result<B>
         abstract fun mapFailure(message: String): Result<A>
+        abstract fun forEach(effect: (A) -> Unit)
 
         internal object Empty: Result<Nothing>() {
             override fun toString(): String = "Empty"
@@ -99,6 +100,8 @@ class Ch7ExercisesTest {
             override fun <B> flatMap(f: (Nothing) -> Result<B>): Result<B> = Empty
 
             override fun mapFailure(message: String): Result<Nothing> = this
+
+            override fun forEach(effect: (Nothing) -> Unit) { }
         }
 
         internal class Failure<out A>(internal val exception: RuntimeException): Result<A>() {
@@ -109,6 +112,8 @@ class Ch7ExercisesTest {
             override fun <B> flatMap(f: (A) -> Result<B>): Result<B> = Failure(this.exception)
 
             override fun mapFailure(message: String): Result<A> = Failure(RuntimeException(message, exception))
+
+            override fun forEach(effect: (A) -> Unit) { }
         }
 
         internal class Success<out A>(internal val value: A): Result<A>() {
@@ -131,6 +136,8 @@ class Ch7ExercisesTest {
             }
 
             override fun mapFailure(message: String): Result<A> = this
+
+            override fun forEach(effect: (A) -> Unit) { effect(this.value) }
         }
 
         companion object {
@@ -283,6 +290,26 @@ class Ch7ExercisesTest {
             assertEquals(empty.toString(), "Empty")
             assertEquals(failure1.toString(), "Failure(what)")
             assertEquals(failure2.toString(), "Failure(Argument 1 does not match condition: what)")
+        }
+    }
+
+    @Nested
+    inner class Ex09 {
+        @Test
+        fun solve() {
+            val success = Result(1) { it == 1 }
+            val empty = Result(1) { it == 2 }
+            val failure1 = Result(null, "what")
+            val failure2 = Result(1, "what") { it == 2 }
+
+            success.forEach {
+                assertEquals(it, 1)
+            }
+
+            // below lambdas shouldn't be called.
+            empty.forEach { throw RuntimeException() }
+            failure1.forEach { throw RuntimeException() }
+            failure2.forEach { throw RuntimeException() }
         }
     }
 }
