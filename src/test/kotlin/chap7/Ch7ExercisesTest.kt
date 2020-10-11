@@ -89,11 +89,16 @@ class Ch7ExercisesTest {
 
         abstract fun<B> map(f: (A) -> B): Result<B>
         abstract fun<B> flatMap(f: (A) -> Result<B>): Result<B>
+        abstract fun mapFailure(message: String): Result<A>
 
         internal object Empty: Result<Nothing>() {
             override fun toString(): String = "Empty"
+
             override fun <B> map(f: (Nothing) -> B): Result<B> = Empty
+
             override fun <B> flatMap(f: (Nothing) -> Result<B>): Result<B> = Empty
+
+            override fun mapFailure(message: String): Result<Nothing> = this
         }
 
         internal class Failure<out A>(internal val exception: RuntimeException): Result<A>() {
@@ -102,6 +107,8 @@ class Ch7ExercisesTest {
             override fun <B> map(f: (A) -> B): Result<B> = Failure(this.exception)
 
             override fun <B> flatMap(f: (A) -> Result<B>): Result<B> = Failure(this.exception)
+
+            override fun mapFailure(message: String): Result<A> = Failure(RuntimeException(message, exception))
         }
 
         internal class Success<out A>(internal val value: A): Result<A>() {
@@ -122,6 +129,8 @@ class Ch7ExercisesTest {
             } catch (e: Exception) {
                 Failure(RuntimeException(e))
             }
+
+            override fun mapFailure(message: String): Result<A> = this
         }
 
         companion object {
@@ -227,6 +236,19 @@ class Ch7ExercisesTest {
 
             assertEquals(i1.exists(p), true)
             assertEquals(i2.exists(p), false)
+        }
+    }
+
+    @Nested
+    inner class Ex07 {
+        @Test
+        fun solve() {
+            val i1 = Result(1)
+            val i2 = Result(2)
+            val p: (Int) -> Boolean = { it == 1 }
+
+            assertEquals(i1.filter(p).mapFailure("what").toString(), "Success(1)")
+            assertEquals(i2.filter(p).mapFailure("what").toString(), "Failure(what)")
         }
     }
 }
