@@ -451,4 +451,17 @@ class Ch7ExercisesTest {
         }
     }
 
+    fun <A, B, C> map2(oa: Result<A>, ob: Result<B>, f: (A) -> (B) -> C): Result<C> = lift2(f)(oa)(ob)
+
+    @Nested
+    inner class Ex14 {
+        @Test
+        fun solve() {
+            val a = Result(1)
+            val b = Result(2)
+            val f: (Int) -> (Int) -> Int = { x -> { y -> x + y} }
+
+            assertEquals(map2(a, b, f).toString(), "Success(3)")
+        }
+    }
 }
