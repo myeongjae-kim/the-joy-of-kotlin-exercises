@@ -404,4 +404,51 @@ class Ch7ExercisesTest {
             failure2.forEachOrElse(onFailure = onFailure2)
         }
     }
+
+    fun <A, B> lift(f: (A) -> B): (Result<A>) -> Result<B> = { it.map(f) }
+
+    @Nested
+    inner class Ex12 {
+        @Test
+        fun solve() {
+            val a: Result<Int> = Result(1)
+            val f: (Int) -> String = { (it + 1).toString() }
+
+            assertEquals(lift(f)(a).toString(), "Success(2)")
+        }
+    }
+
+    fun <A, B, C> lift2(f: (A) -> (B) -> C): (Result<A>) -> (Result<B>) -> Result<C> =
+            { a ->
+                { b ->
+                    a.map(f).flatMap { b.map(it) }
+                }
+            }
+
+    fun <A, B, C, D> lift3(f: (A) -> (B) -> (C) -> D): (Result<A>) -> (Result<B>) -> (Result<C>) -> Result<D> =
+            { a ->
+                { b ->
+                    { c ->
+                        a.map(f).flatMap { f2 -> b.map(f2).flatMap { f3 -> c.map(f3) } }
+                    }
+                }
+            }
+
+    @Nested
+    inner class Ex13 {
+        @Test
+        fun solve() {
+            val f2: (Int) -> (Int) -> Int = { a -> { b -> a + 1 + b + 1 } }
+            val f3: (Int) -> (Int) -> (Int) -> Int = { a -> { b -> { c -> a + 1 + b + 1 + c + 1 } } }
+
+            val resultLift2 = lift2(f2)
+            val resultLift3 = lift3(f3)
+
+            val result = Result(1)
+
+            assertEquals(resultLift2(result)(result).toString(), "Success(4)")
+            assertEquals(resultLift3(result)(result)(result).toString(), "Success(6)")
+        }
+    }
+
 }
