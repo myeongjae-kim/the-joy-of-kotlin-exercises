@@ -90,6 +90,12 @@ class Ch7ExercisesTest {
         abstract fun<B> map(f: (A) -> B): Result<B>
         abstract fun<B> flatMap(f: (A) -> Result<B>): Result<B>
 
+        internal object Empty: Result<Nothing>() {
+            override fun toString(): String = "Empty"
+            override fun <B> map(f: (Nothing) -> B): Result<B> = Empty
+            override fun <B> flatMap(f: (Nothing) -> Result<B>): Result<B> = Empty
+        }
+
         internal class Failure<out A>(internal val exception: RuntimeException): Result<A>() {
             override fun toString(): String = "Failure(${exception.message})"
 
@@ -119,6 +125,8 @@ class Ch7ExercisesTest {
         }
 
         companion object {
+            operator fun <A> invoke(): Result<A> = Empty
+
             operator fun <A> invoke(a: A? = null): Result<A> = when(a) {
                 null -> Failure(NullPointerException())
                 else -> Success(a)
@@ -131,18 +139,29 @@ class Ch7ExercisesTest {
 
         fun getOrElse(defaultValue: @UnsafeVariance A): A = when(this) {
             is Success -> this.value
-            is Failure -> defaultValue
+            else -> defaultValue
         }
 
         fun orElse(defaultValue: () -> Result<@UnsafeVariance A>): Result<A> = when(this) {
             is Success -> this
-            is Failure -> try {
+            else -> try {
                 defaultValue()
             } catch (e: RuntimeException) {
                 Failure(e)
             } catch (e: Exception) {
                 Failure(RuntimeException(e))
             }
+        }
+
+        fun filter(p: (A) -> Boolean, failureMessage: String): Result<A> = flatMap {
+            if (p(it))
+                this
+            else
+                failure(failureMessage)
+        }
+
+        fun filter(p: (A) -> Boolean): Result<A> {
+            return filter(p, "Condition not matched")
         }
     }
 
@@ -179,6 +198,20 @@ class Ch7ExercisesTest {
             assertEquals(failure.orElse(fElse).toString(), "Success(2)")
             assertEquals(success.orElse(fElseException).toString(), "Success(1)")
             assertEquals(failure.orElse(fElseException).toString(), "Failure(e)")
+        }
+    }
+
+
+    @Nested
+    inner class Ex05 {
+        @Test
+        fun solve() {
+            val i1 = Result(1)
+            val i2 = Result(2)
+            val p: (Int) -> Boolean = { it == 1 }
+
+            assertEquals(i1.filter(p).toString(), "Success(1)")
+            assertEquals(i2.filter(p).toString(), "Failure(Condition not matched)")
         }
     }
 }
