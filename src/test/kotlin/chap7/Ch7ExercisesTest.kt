@@ -2,6 +2,9 @@ package chap7
 
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import java.io.Serializable
+import java.lang.IllegalStateException
+import java.lang.RuntimeException
 import kotlin.test.assertEquals
 
 class Ch7ExercisesTest {
@@ -79,6 +82,103 @@ class Ch7ExercisesTest {
 
             assertEquals(result3, 2)
             assertEquals(result4.toString(), "Right(2)")
+        }
+    }
+
+    sealed class Result<out A>: Serializable {
+
+        abstract fun<B> map(f: (A) -> B): Result<B>
+        abstract fun<B> flatMap(f: (A) -> Result<B>): Result<B>
+
+        internal class Failure<out A>(internal val exception: RuntimeException): Result<A>() {
+            override fun toString(): String = "Failure(${exception.message})"
+
+            override fun <B> map(f: (A) -> B): Result<B> = Failure(this.exception)
+
+            override fun <B> flatMap(f: (A) -> Result<B>): Result<B> = Failure(this.exception)
+        }
+
+        internal class Success<out A>(internal val value: A): Result<A>() {
+            override fun toString(): String = "Success($value)"
+
+            override fun <B> map(f: (A) -> B): Result<B> = try {
+                Success(f(this.value))
+            } catch (e: RuntimeException) {
+                Failure(e)
+            } catch (e: Exception) {
+                Failure(RuntimeException(e))
+            }
+
+            override fun <B> flatMap(f: (A) -> Result<B>): Result<B> = try {
+                f(this.value)
+            } catch (e: RuntimeException) {
+                Failure(e)
+            } catch (e: Exception) {
+                Failure(RuntimeException(e))
+            }
+        }
+
+        companion object {
+            operator fun <A> invoke(a: A? = null): Result<A> = when(a) {
+                null -> Failure(NullPointerException())
+                else -> Success(a)
+            }
+        }
+
+        fun <A> failure(message: String): Result<A> = Failure(IllegalStateException(message))
+        fun <A> failure(exception: RuntimeException): Result<A> = Failure(exception)
+        fun <A> failure(exception: Exception): Result<A> = Failure(IllegalStateException(exception))
+
+        fun getOrElse(defaultValue: @UnsafeVariance A): A = when(this) {
+            is Success -> this.value
+            is Failure -> defaultValue
+        }
+
+        fun orElse(defaultValue: () -> Result<@UnsafeVariance A>): Result<A> = when(this) {
+            is Success -> this
+            is Failure -> try {
+                defaultValue()
+            } catch (e: RuntimeException) {
+                Failure(e)
+            } catch (e: Exception) {
+                Failure(RuntimeException(e))
+            }
+        }
+    }
+
+    @Nested
+    inner class Ex04 {
+        @Test
+        fun solve() {
+            val success: Result<Int> = Result(1)
+            val failure: Result<Int> = Result(null)
+
+            val f: (Int) -> String = Int::toString
+            val fFlat: (Int) -> Result<String> = { Result(f(it)) }
+
+            val fException: (Int) -> String = { throw RuntimeException("e") }
+            val fFlatException: (Int) -> Result<String> = { throw RuntimeException("e") }
+
+            assertEquals(success.map(f).toString(), "Success(1)")
+            assertEquals(failure.map(f).toString(), "Failure(null)")
+            assertEquals(success.map(fException).toString(), "Failure(e)")
+            assertEquals(failure.map(fException).toString(), "Failure(null)")
+
+            assertEquals(success.flatMap(fFlat).toString(), "Success(1)")
+            assertEquals(failure.flatMap(fFlat).toString(), "Failure(null)")
+            assertEquals(success.flatMap(fFlatException).toString(), "Failure(e)")
+            assertEquals(failure.flatMap(fFlatException).toString(), "Failure(null)")
+
+            assertEquals(success.getOrElse(2), 1)
+            assertEquals(failure.getOrElse(2), 2)
+
+            val fElse: () -> Result<Int> = { Result(2) }
+            val fElseException: () -> Result<Int> = { throw RuntimeException("e") }
+
+            assertEquals(success.orElse(fElse).toString(), "Success(1)")
+            assertEquals(failure.orElse(fElse).toString(), "Success(2)")
+            assertEquals(success.orElse(fElseException).toString(), "Success(1)")
+            assertEquals(failure.orElse(fElseException).toString(), "Failure(e)")
         }
     }
 }
