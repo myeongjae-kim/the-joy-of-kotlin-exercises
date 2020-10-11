@@ -92,9 +92,9 @@ class Ch7ExercisesTest {
         abstract fun mapFailure(message: String): Result<A>
         abstract fun forEach(effect: (A) -> Unit)
         abstract fun forEachOrElse(
-                onSuccess: (A) -> Unit,
-                onFailure: (RuntimeException) -> Unit,
-                onEmpty: () -> Unit)
+                onSuccess: (A) -> Unit = {},
+                onFailure: (RuntimeException) -> Unit = {},
+                onEmpty: () -> Unit = {})
 
         internal object Empty: Result<Nothing>() {
             override fun toString(): String = "Empty"
@@ -370,6 +370,38 @@ class Ch7ExercisesTest {
             empty.forEachOrElse(onSuccess, onFailure1, onEmpty)
             failure1.forEachOrElse(onSuccess, onFailure1, onEmpty)
             failure2.forEachOrElse(onSuccess, onFailure2, onEmpty)
+        }
+    }
+
+    @Nested
+    inner class Ex11 {
+        @Test
+        fun solve() {
+            val success = Result(1) { it == 1 }
+            val empty = Result(1) { it == 2 }
+            val failure1 = Result(null, "what")
+            val failure2 = Result(1, "what") { it == 2 }
+
+            val onSuccess: (Int) -> Unit = {
+                assertEquals(it, 1)
+            }
+
+            val onEmpty: () -> Unit = {
+                println("it is empty")
+            }
+
+            val onFailure1: (RuntimeException) -> Unit = {
+                assert(it is NullPointerException)
+            }
+
+            val onFailure2: (RuntimeException) -> Unit = {
+                assert(it is IllegalStateException)
+            }
+
+            success.forEachOrElse(onSuccess = onSuccess)
+            empty.forEachOrElse(onEmpty = onEmpty)
+            failure1.forEachOrElse(onFailure = onFailure1)
+            failure2.forEachOrElse(onFailure = onFailure2)
         }
     }
 }
