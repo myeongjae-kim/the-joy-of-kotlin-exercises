@@ -17,20 +17,21 @@ class Ch5ExercisesTest {
         // Cons means Construct.
         internal class Cons<A>(
             val head: A,
-            val tail: List<A>) : List<A>() {
+            val tail: List<A>
+        ) : List<A>() {
 
             override fun isEmpty(): Boolean = false
 
             override fun toString(): String = "[${toString("", this)}NIL]"
 
-            private tailrec fun toString(acc: String, list: List<A>): String = when(list) {
+            private tailrec fun toString(acc: String, list: List<A>): String = when (list) {
                 is Nil -> acc
                 is Cons -> toString("$acc${list.head}, ", list.tail)
             }
         }
 
         fun cons(elem: A): List<A> = cons(this, elem)
-        fun setHead(elem: A) : List<A> = setHead(this, elem)
+        fun setHead(elem: A): List<A> = setHead(this, elem)
         fun drop(n: Int): List<A> = drop(this, n)
         fun dropWhile(p: (A) -> Boolean): List<A> = dropWhile(this, p)
         fun concat(list: List<A>): List<A> = concat(this, list)
@@ -38,12 +39,12 @@ class Ch5ExercisesTest {
         fun init(): List<A> = init(this)
 
         fun <B> foldRight(identity: B, f: (A) -> (B) -> B) = foldRight(this, identity, f)
-        fun length(): Int = foldLeft(0) {  { _ -> it + 1} }
+        fun length(): Int = foldLeft(0) { { _ -> it + 1 } }
 
         fun <B> foldLeft(identity: B, f: (B) -> (A) -> B) = foldLeft(identity, this, f)
 
         fun <B> foldRightViaFoldLeft(identity: B, f: (A) -> (B) -> B) =
-            this.reverse().foldLeft(identity, { b -> { a -> f(a)(b)}})
+            this.reverse().foldLeft(identity, { b -> { a -> f(a)(b) } })
 
         fun <B> coFoldRight(identity: B, f: (A) -> (B) -> B): B =
             Companion.coFoldRight(identity, this.reverse(), identity, f)
@@ -58,11 +59,11 @@ class Ch5ExercisesTest {
             @Suppress("UNCHECKED_CAST")
             operator
             fun <A> invoke(vararg az: A): List<A> =
-                az.foldRight(Nil as List<A>, {elem, acc -> Cons(elem, acc)})
+                az.foldRight(Nil as List<A>, { elem, acc -> Cons(elem, acc) })
 
             fun <A> cons(list: List<A>, elem: A): List<A> = Cons(elem, list)
 
-            fun <A> setHead(list: List<A>, elem: A) : List<A> = when(list) {
+            fun <A> setHead(list: List<A>, elem: A): List<A> = when (list) {
                 Nil -> throw RuntimeException("cannot setHead of empty list.")
                 is Cons -> list.tail.cons(elem)
             }
@@ -77,24 +78,24 @@ class Ch5ExercisesTest {
                 is Cons -> if (p(list.head)) dropWhile(list.tail, p) else list
             }
 
-            fun <A> concat(list1: List<A>, list2: List<A>) : List<A> = when (list1) {
+            fun <A> concat(list1: List<A>, list2: List<A>): List<A> = when (list1) {
                 Nil -> list2
                 is Cons -> concat(list1.tail, list2).cons(list1.head)
             }
 
             // efficient but not stack-safe
-            fun <A> concatViaFoldRight(list1: List<A>, list2: List<A>) : List<A> =
-                list1.foldRight(list2, {elem -> { acc -> acc.cons(elem) }})
+            fun <A> concatViaFoldRight(list1: List<A>, list2: List<A>): List<A> =
+                list1.foldRight(list2, { elem -> { acc -> acc.cons(elem) } })
 
             // stack-safe
-            fun <A> concatViaCoFoldRight(list1: List<A>, list2: List<A>) : List<A> =
-                list1.coFoldRight(list2, {elem -> { acc -> acc.cons(elem) }})
+            fun <A> concatViaCoFoldRight(list1: List<A>, list2: List<A>): List<A> =
+                list1.coFoldRight(list2, { elem -> { acc -> acc.cons(elem) } })
 
-            fun <A> concatViaFoldLeft(list1: List<A>, list2: List<A>) : List<A> =
-                list1.reverse().foldLeft(list2, { acc -> { elem -> acc.cons(elem) }})
+            fun <A> concatViaFoldLeft(list1: List<A>, list2: List<A>): List<A> =
+                list1.reverse().foldLeft(list2, { acc -> { elem -> acc.cons(elem) } })
 
             // my implementation. Not corecursive and not reusing objects...
-            fun <A> myInit(list: List<A>) : List<A> = when(list) {
+            fun <A> myInit(list: List<A>): List<A> = when (list) {
                 Nil -> list
                 is Cons<A> ->
                     if (list.tail == Nil)
@@ -104,7 +105,7 @@ class Ch5ExercisesTest {
             }
 
             fun <A> reverse(list: List<A>): List<A> =
-                list.foldLeft(invoke(), { acc -> { elem -> acc.cons(elem) }})
+                list.foldLeft(invoke(), { acc -> { elem -> acc.cons(elem) } })
 
             fun <A> init(list: List<A>): List<A> = list.reverse().drop(1).reverse()
 
@@ -128,12 +129,17 @@ class Ch5ExercisesTest {
             fun <A> flatten(lists: List<List<A>>): List<A> =
                 lists.foldLeft(invoke()) { acc -> acc::concat }
 
-            fun <A, B> map(list: List<A>, f: (A) -> B): List<B> = list.coFoldRight(invoke(), {elem -> {acc -> acc.cons(f(elem))}})
+            fun <A, B> map(list: List<A>, f: (A) -> B): List<B> = list.coFoldRight(invoke(), { elem -> { acc -> acc.cons(f(elem)) } })
 
-            fun <A> filter(list: List<A>, p: (A) -> Boolean): List<A> = list.coFoldRight(invoke(), {elem -> { acc ->
-                if (p(elem)) acc.cons(elem)
-                else acc
-            }})
+            fun <A> filter(list: List<A>, p: (A) -> Boolean): List<A> = list.coFoldRight(
+                invoke(),
+                { elem ->
+                    { acc ->
+                        if (p(elem)) acc.cons(elem)
+                        else acc
+                    }
+                }
+            )
 
             fun <A, B> flatMap(list: List<A>, f: (A) -> List<B>): List<B> = flatten(list.map(f))
 
@@ -278,8 +284,8 @@ class Ch5ExercisesTest {
 
         @Test
         fun solve() {
-            fun sum(list: List<Int>): Int = list.foldLeft(0, {x -> {y -> x + y}})
-            fun product(list: List<Double>): Double = list.foldLeft(1.0, {x -> {y -> x * y}})
+            fun sum(list: List<Int>): Int = list.foldLeft(0, { x -> { y -> x + y } })
+            fun product(list: List<Double>): Double = list.foldLeft(1.0, { x -> { y -> x * y } })
 
             assertEquals(sum(List(1, 2, 3)), 6)
             assertEquals(product(List(1.0, 2.0, 3.0)), 6.0)
@@ -299,7 +305,6 @@ class Ch5ExercisesTest {
         }
     }
 
-
     @Nested
     inner class Ex12 {
 
@@ -308,12 +313,14 @@ class Ch5ExercisesTest {
             val list: List<Int> = List(1, 2, 3)
 
             assertEquals(
-                list.foldRight("") {elem -> { acc -> "$elem, $acc" }},
-                list.foldRightViaFoldLeft("") {elem -> { acc -> "$elem, $acc" }})
+                list.foldRight("") { elem -> { acc -> "$elem, $acc" } },
+                list.foldRightViaFoldLeft("") { elem -> { acc -> "$elem, $acc" } }
+            )
 
             assert(
-                list.foldRightViaFoldLeft("") {elem -> { acc -> "$elem, $acc" }}
-                        != list.foldLeft("") {elem -> { acc -> "$elem, $acc" }})
+                list.foldRightViaFoldLeft("") { elem -> { acc -> "$elem, $acc" } }
+                    != list.foldLeft("") { elem -> { acc -> "$elem, $acc" } }
+            )
         }
     }
 
@@ -323,15 +330,17 @@ class Ch5ExercisesTest {
         @Test
         fun solve() {
             val list: List<Int> = List(1, 2, 3)
-            val f: (Int) -> (String) -> String = { elem -> { acc -> "$elem, $acc" }}
+            val f: (Int) -> (String) -> String = { elem -> { acc -> "$elem, $acc" } }
 
             assertEquals(
                 list.foldRight("", f),
-                list.foldRightViaFoldLeft("", f))
+                list.foldRightViaFoldLeft("", f)
+            )
 
             assertEquals(
                 list.foldRightViaFoldLeft("", f),
-                list.coFoldRight("", f))
+                list.coFoldRight("", f)
+            )
         }
     }
 
@@ -345,15 +354,18 @@ class Ch5ExercisesTest {
 
             assertEquals(
                 list1.concat(list2).toString(),
-                List.concatViaFoldLeft(list1, list2).toString())
+                List.concatViaFoldLeft(list1, list2).toString()
+            )
 
             assertEquals(
                 List.concatViaFoldLeft(list1, list2).toString(),
-                List.concatViaFoldRight(list1, list2).toString())
+                List.concatViaFoldRight(list1, list2).toString()
+            )
 
             assertEquals(
                 List.concatViaFoldRight(list1, list2).toString(),
-                List.concatViaCoFoldRight(list1, list2).toString())
+                List.concatViaCoFoldRight(list1, list2).toString()
+            )
         }
     }
 
@@ -363,9 +375,9 @@ class Ch5ExercisesTest {
         @Test
         fun solve() {
             val lists: List<List<Int>> = List(
-                List(1,2),
-                List(3,4),
-                List(5,6)
+                List(1, 2),
+                List(3, 4),
+                List(5, 6)
             )
 
             assertEquals(List.flatten(lists).toString(), "[1, 2, 3, 4, 5, 6, NIL]")
@@ -377,11 +389,12 @@ class Ch5ExercisesTest {
 
         @Test
         fun solve() {
-            fun triple(list: List<Int>): List<Int> = list.foldRight(List()) {elem -> {acc -> acc.cons(elem * 3)}}
+            fun triple(list: List<Int>): List<Int> = list.foldRight(List()) { elem -> { acc -> acc.cons(elem * 3) } }
 
             assertEquals(
                 triple(List(1, 2, 3)).toString(),
-                "[3, 6, 9, NIL]")
+                "[3, 6, 9, NIL]"
+            )
         }
     }
 
@@ -390,11 +403,12 @@ class Ch5ExercisesTest {
 
         @Test
         fun solve() {
-            fun doubleToString(list: List<Double>): List<String> = list.foldRight(List()) {elem -> {acc -> acc.cons(elem.toString())}}
+            fun doubleToString(list: List<Double>): List<String> = list.foldRight(List()) { elem -> { acc -> acc.cons(elem.toString()) } }
 
             assertEquals(
                 doubleToString(List(1.0, 2.0, 3.0)).toString(),
-                "[1.0, 2.0, 3.0, NIL]")
+                "[1.0, 2.0, 3.0, NIL]"
+            )
         }
     }
 
@@ -405,7 +419,8 @@ class Ch5ExercisesTest {
         fun solve() {
             assertEquals(
                 List(1.0, 2.0, 3.0).map(Double::toString).toString(),
-                "[1.0, 2.0, 3.0, NIL]")
+                "[1.0, 2.0, 3.0, NIL]"
+            )
         }
     }
 
@@ -415,8 +430,9 @@ class Ch5ExercisesTest {
         @Test
         fun solve() {
             assertEquals(
-                List(1, 2, 3).filter{ it != 2 }.toString(),
-                "[1, 3, NIL]")
+                List(1, 2, 3).filter { it != 2 }.toString(),
+                "[1, 3, NIL]"
+            )
         }
     }
 
@@ -426,8 +442,9 @@ class Ch5ExercisesTest {
         @Test
         fun solve() {
             assertEquals(
-                List(1, 2, 3).flatMap{ i -> List(i, -i) }.toString(),
-                "[1, -1, 2, -2, 3, -3, NIL]")
+                List(1, 2, 3).flatMap { i -> List(i, -i) }.toString(),
+                "[1, -1, 2, -2, 3, -3, NIL]"
+            )
         }
     }
 
@@ -437,8 +454,9 @@ class Ch5ExercisesTest {
         @Test
         fun solve() {
             assertEquals(
-                List(1, 2, 3).filterViaFlatMap{ it != 2 }.toString(),
-                "[1, 3, NIL]")
+                List(1, 2, 3).filterViaFlatMap { it != 2 }.toString(),
+                "[1, 3, NIL]"
+            )
         }
     }
 }

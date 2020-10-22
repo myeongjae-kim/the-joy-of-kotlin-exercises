@@ -13,20 +13,20 @@ class Ch7ExercisesTest {
         abstract fun <B> map(f: (A) -> B): Either<E, B>
         abstract fun <B> flatMap(f: (A) -> Either<@UnsafeVariance E, B>): Either<E, B>
 
-        fun getOrElse(defaultValue: () -> @UnsafeVariance A): A = when(this) {
+        fun getOrElse(defaultValue: () -> @UnsafeVariance A): A = when (this) {
             is Left -> defaultValue()
             is Right -> this.value
         }
 
         fun orElse(default: () -> Either<@UnsafeVariance E, @UnsafeVariance A>): Either<E, A> = map { this }.getOrElse(default)
 
-        internal class Left<out E, out A>(private val value: E): Either<E, A>() {
+        internal class Left<out E, out A>(private val value: E) : Either<E, A>() {
             override fun toString(): String = "Left($value)"
             override fun <B> map(f: (A) -> B): Either<E, B> = Left(value)
             override fun <B> flatMap(f: (A) -> Either<@UnsafeVariance E, B>): Either<E, B> = Left(value)
         }
 
-        internal class Right<out E, out A>(internal val value: A): Either<E, A>() {
+        internal class Right<out E, out A>(internal val value: A) : Either<E, A>() {
             override fun toString(): String = "Right($value)"
             override fun <B> map(f: (A) -> B): Either<E, B> = Right(f(this.value))
             override fun <B> flatMap(f: (A) -> Either<@UnsafeVariance E, B>): Either<E, B> = f(this.value)
@@ -85,18 +85,19 @@ class Ch7ExercisesTest {
         }
     }
 
-    sealed class Result<out A>: Serializable {
+    sealed class Result<out A> : Serializable {
 
-        abstract fun<B> map(f: (A) -> B): Result<B>
-        abstract fun<B> flatMap(f: (A) -> Result<B>): Result<B>
+        abstract fun <B> map(f: (A) -> B): Result<B>
+        abstract fun <B> flatMap(f: (A) -> Result<B>): Result<B>
         abstract fun mapFailure(message: String): Result<A>
         abstract fun forEach(effect: (A) -> Unit)
         abstract fun forEachOrElse(
-                onSuccess: (A) -> Unit = {},
-                onFailure: (RuntimeException) -> Unit = {},
-                onEmpty: () -> Unit = {})
+            onSuccess: (A) -> Unit = {},
+            onFailure: (RuntimeException) -> Unit = {},
+            onEmpty: () -> Unit = {}
+        )
 
-        internal object Empty: Result<Nothing>() {
+        internal object Empty : Result<Nothing>() {
             override fun toString(): String = "Empty"
 
             override fun <B> map(f: (Nothing) -> B): Result<B> = Empty
@@ -108,15 +109,15 @@ class Ch7ExercisesTest {
             override fun forEach(effect: (Nothing) -> Unit) { }
 
             override fun forEachOrElse(
-                    onSuccess: (Nothing) -> Unit,
-                    onFailure: (RuntimeException) -> Unit,
-                    onEmpty: () -> Unit
+                onSuccess: (Nothing) -> Unit,
+                onFailure: (RuntimeException) -> Unit,
+                onEmpty: () -> Unit
             ) {
                 onEmpty()
             }
         }
 
-        internal class Failure<out A>(internal val exception: RuntimeException): Result<A>() {
+        internal class Failure<out A>(internal val exception: RuntimeException) : Result<A>() {
             override fun toString(): String = "Failure(${exception.message})"
 
             override fun <B> map(f: (A) -> B): Result<B> = Failure(this.exception)
@@ -128,15 +129,15 @@ class Ch7ExercisesTest {
             override fun forEach(effect: (A) -> Unit) { }
 
             override fun forEachOrElse(
-                    onSuccess: (A) -> Unit,
-                    onFailure: (RuntimeException) -> Unit,
-                    onEmpty: () -> Unit
+                onSuccess: (A) -> Unit,
+                onFailure: (RuntimeException) -> Unit,
+                onEmpty: () -> Unit
             ) {
                 onFailure(this.exception)
             }
         }
 
-        internal class Success<out A>(internal val value: A): Result<A>() {
+        internal class Success<out A>(internal val value: A) : Result<A>() {
             override fun toString(): String = "Success($value)"
 
             override fun <B> map(f: (A) -> B): Result<B> = try {
@@ -160,9 +161,9 @@ class Ch7ExercisesTest {
             override fun forEach(effect: (A) -> Unit) { effect(this.value) }
 
             override fun forEachOrElse(
-                    onSuccess: (A) -> Unit,
-                    onFailure: (RuntimeException) -> Unit,
-                    onEmpty: () -> Unit
+                onSuccess: (A) -> Unit,
+                onFailure: (RuntimeException) -> Unit,
+                onEmpty: () -> Unit
             ) {
                 onSuccess(this.value)
             }
@@ -171,22 +172,22 @@ class Ch7ExercisesTest {
         companion object {
             operator fun <A> invoke(): Result<A> = Empty
 
-            operator fun <A> invoke(a: A? = null): Result<A> = when(a) {
+            operator fun <A> invoke(a: A? = null): Result<A> = when (a) {
                 null -> Failure(NullPointerException())
                 else -> Success(a)
             }
 
-            operator fun <A> invoke(a: A? = null, message: String): Result<A> = when(a) {
+            operator fun <A> invoke(a: A? = null, message: String): Result<A> = when (a) {
                 null -> Failure(NullPointerException(message))
                 else -> Success(a)
             }
 
-            operator fun <A> invoke(a: A? = null, p: (A) -> Boolean): Result<A> = when(a) {
+            operator fun <A> invoke(a: A? = null, p: (A) -> Boolean): Result<A> = when (a) {
                 null -> Failure(NullPointerException())
                 else -> if (p(a)) Success(a) else Empty
             }
 
-            operator fun <A> invoke(a: A? = null, message: String, p: (A) -> Boolean): Result<A> = when(a) {
+            operator fun <A> invoke(a: A? = null, message: String, p: (A) -> Boolean): Result<A> = when (a) {
                 null -> Failure(NullPointerException(message))
                 else -> when {
                     (p(a)) -> Success(a)
@@ -199,20 +200,21 @@ class Ch7ExercisesTest {
         fun <A> failure(exception: RuntimeException): Result<A> = Failure(exception)
         fun <A> failure(exception: Exception): Result<A> = Failure(IllegalStateException(exception))
 
-        fun getOrElse(defaultValue: @UnsafeVariance A): A = when(this) {
+        fun getOrElse(defaultValue: @UnsafeVariance A): A = when (this) {
             is Success -> this.value
             else -> defaultValue
         }
 
-        fun orElse(defaultValue: () -> Result<@UnsafeVariance A>): Result<A> = when(this) {
+        fun orElse(defaultValue: () -> Result<@UnsafeVariance A>): Result<A> = when (this) {
             is Success -> this
-            else -> try {
-                defaultValue()
-            } catch (e: RuntimeException) {
-                Failure(e)
-            } catch (e: Exception) {
-                Failure(RuntimeException(e))
-            }
+            else ->
+                try {
+                    defaultValue()
+                } catch (e: RuntimeException) {
+                    Failure(e)
+                } catch (e: Exception) {
+                    Failure(RuntimeException(e))
+                }
         }
 
         fun filter(p: (A) -> Boolean, failureMessage: String): Result<A> = flatMap {
@@ -264,7 +266,6 @@ class Ch7ExercisesTest {
             assertEquals(failure.orElse(fElseException).toString(), "Failure(e)")
         }
     }
-
 
     @Nested
     inner class Ex05 {
@@ -419,20 +420,20 @@ class Ch7ExercisesTest {
     }
 
     fun <A, B, C> lift2(f: (A) -> (B) -> C): (Result<A>) -> (Result<B>) -> Result<C> =
-            { a ->
-                { b ->
-                    a.map(f).flatMap { b.map(it) }
-                }
+        { a ->
+            { b ->
+                a.map(f).flatMap { b.map(it) }
             }
+        }
 
     fun <A, B, C, D> lift3(f: (A) -> (B) -> (C) -> D): (Result<A>) -> (Result<B>) -> (Result<C>) -> Result<D> =
-            { a ->
-                { b ->
-                    { c ->
-                        a.map(f).flatMap { f2 -> b.map(f2).flatMap { f3 -> c.map(f3) } }
-                    }
+        { a ->
+            { b ->
+                { c ->
+                    a.map(f).flatMap { f2 -> b.map(f2).flatMap { f3 -> c.map(f3) } }
                 }
             }
+        }
 
     @Nested
     inner class Ex13 {
@@ -459,7 +460,7 @@ class Ch7ExercisesTest {
         fun solve() {
             val a = Result(1)
             val b = Result(2)
-            val f: (Int) -> (Int) -> Int = { x -> { y -> x + y} }
+            val f: (Int) -> (Int) -> Int = { x -> { y -> x + y } }
 
             assertEquals(map2(a, b, f).toString(), "Success(3)")
         }

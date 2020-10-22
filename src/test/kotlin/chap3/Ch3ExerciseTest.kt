@@ -166,7 +166,7 @@ class Ch3ExerciseTest {
 
     @Nested
     inner class Ex11 {
-        private fun <T, U, V> swap(curried: (T) -> (U) -> V): (U) -> (T) -> V = {u -> { t -> curried(t)(u)}}
+        private fun <T, U, V> swap(curried: (T) -> (U) -> V): (U) -> (T) -> V = { u -> { t -> curried(t)(u) } }
 
         @Test
         fun test() {

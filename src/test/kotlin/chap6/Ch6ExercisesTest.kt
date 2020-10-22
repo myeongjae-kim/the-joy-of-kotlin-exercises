@@ -1,6 +1,6 @@
 package chap6
 
-import chap5.Ch5ExercisesTest
+import chap5.Ch5ExercisesTest.List
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -8,7 +8,6 @@ import java.lang.RuntimeException
 import kotlin.math.pow
 import kotlin.test.assertEquals
 import kotlin.collections.List as ListStandard
-import chap5.Ch5ExercisesTest.List
 
 class Ch6ExercisesTest {
 
@@ -18,12 +17,12 @@ class Ch6ExercisesTest {
 
         abstract fun <B> map(f: (A) -> B): Option<B>
 
-        fun getOrElse(default: @UnsafeVariance A): A = when(this) {
+        fun getOrElse(default: @UnsafeVariance A): A = when (this) {
             None -> default
             is Some -> this.value
         }
 
-        fun getOrElse(default: () -> @UnsafeVariance A): A = when(this) {
+        fun getOrElse(default: () -> @UnsafeVariance A): A = when (this) {
             None -> default()
             is Some -> this.value
         }
@@ -34,7 +33,7 @@ class Ch6ExercisesTest {
 
         fun filter(p: (A) -> Boolean): Option<A> = flatMap { if (p(it)) this else None }
 
-        internal object None: Option<Nothing>() {
+        internal object None : Option<Nothing>() {
 
             override fun isEmpty(): Boolean = true
 
@@ -47,7 +46,7 @@ class Ch6ExercisesTest {
             override fun <B> map(f: (Nothing) -> B): Option<B> = None
         }
 
-        internal data class Some<out A>(internal val value: A): Option<A>() {
+        internal data class Some<out A>(internal val value: A) : Option<A>() {
 
             override fun isEmpty() = false
 
@@ -72,7 +71,7 @@ class Ch6ExercisesTest {
         }
     }
 
-    fun <T: Comparable<T>> max(list: ListStandard<T>): Option<T> = Option(list.maxByOrNull { it })
+    fun <T : Comparable<T>> max(list: ListStandard<T>): Option<T> = Option(list.maxByOrNull { it })
 
     fun getDefault(): Int = throw RuntimeException()
 
@@ -136,9 +135,9 @@ class Ch6ExercisesTest {
         // ListStandard<T> is alias of kotlin standard List<T>.
         val myVariance: (ListStandard<Double>) -> Option<Double> = {
             Option(it)
-                    .filter { l -> l.isNotEmpty() }
-                    .map { l -> l.sum() / l.size }
-                    .map { m -> it.fold(0.0, {acc, x -> (x - m).pow(2.0) + acc}) / it.size }
+                .filter { l -> l.isNotEmpty() }
+                .map { l -> l.sum() / l.size }
+                .map { m -> it.fold(0.0, { acc, x -> (x - m).pow(2.0) + acc }) / it.size }
         }
 
         // book's implementation
@@ -200,27 +199,27 @@ class Ch6ExercisesTest {
     }
 
     fun <A, B, C> myMap2(a: Option<A>, b: Option<B>, f: (A) -> (B) -> C): Option<C> =
-            a.map(f).flatMap { b.map(it) }
+        a.map(f).flatMap { b.map(it) }
 
     // 매개변수들을 closure로 몽땅 잡은 다음에 가장 안쪽에 있는 함수에서 f를 콜한다.
     // 함수형 프로그래밍의 전형적인 패턴.
     // 이런식으로 작성하면 map3, map4 등도 쉽게 작성 가능함
     fun <A, B, C> map2(oa: Option<A>, ob: Option<B>, f: (A) -> (B) -> C): Option<C> =
-            oa.flatMap { a -> ob.map { b -> f(a)(b) } }
+        oa.flatMap { a -> ob.map { b -> f(a)(b) } }
 
     fun <A, B, C, D> map3(
-            oa: Option<A>,
-            ob: Option<B>,
-            oc: Option<C>,
-            f: (A) -> (B) -> (C) -> D
+        oa: Option<A>,
+        ob: Option<B>,
+        oc: Option<C>,
+        f: (A) -> (B) -> (C) -> D
     ): Option<D> = oa.flatMap { a -> ob.flatMap { b -> oc.map { c -> f(a)(b)(c) } } }
 
     fun <A, B, C, D, E> map4(
-            oa: Option<A>,
-            ob: Option<B>,
-            oc: Option<C>,
-            od: Option<D>,
-            f: (A) -> (B) -> (C) -> (D) -> E
+        oa: Option<A>,
+        ob: Option<B>,
+        oc: Option<C>,
+        od: Option<D>,
+        f: (A) -> (B) -> (C) -> (D) -> E
     ): Option<E> = oa.flatMap { a -> ob.flatMap { b -> oc.flatMap { c -> od.map { d -> f(a)(b)(c)(d) } } } }
 
     @Nested
@@ -230,7 +229,7 @@ class Ch6ExercisesTest {
         fun solve() {
             val a: Option<Int> = Option(1)
             val b: Option<Double> = Option(2.0)
-            val f: (Int) -> (Double) -> String = {x -> {y -> (x + y).toString() }}
+            val f: (Int) -> (Double) -> String = { x -> { y -> (x + y).toString() } }
 
             assertEquals(map2(a, b, f).getOrElse(""), "3.0")
         }
@@ -254,13 +253,13 @@ class Ch6ExercisesTest {
     // None의 map을 호출하면 map의 매개변수에 어떤 함수가 들어오든지 상관없이 함수를 호출하지 않고 None객체가 다시 나온다.
     // 따라서 아래 매개변수 list에 하나라도 None객체가 있으면 결과가 None이 된다.
     fun <A, B> traverse(list: List<A>, f: (A) -> Option<B>): Option<List<B>> =
-            list.foldRight(Option(List())) { x ->
-                { y: Option<List<B>> ->
-                    map2(f(x), y) { a ->
-                        { b: List<B> -> b.cons(a) }
-                    }
+        list.foldRight(Option(List())) { x ->
+            { y: Option<List<B>> ->
+                map2(f(x), y) { a ->
+                    { b: List<B> -> b.cons(a) }
                 }
             }
+        }
 
     // 돌겠네.. Ex11, Ex12 어려움.
     @Nested
@@ -277,5 +276,4 @@ class Ch6ExercisesTest {
             assertEquals(traverse(list2, f), Option())
         }
     }
-
 }

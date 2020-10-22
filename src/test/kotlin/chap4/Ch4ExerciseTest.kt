@@ -7,7 +7,7 @@ import java.math.BigInteger
 import kotlin.test.assertEquals
 
 object Factorial {
-    private lateinit var fact: (Int) -> Int;
+    private lateinit var fact: (Int) -> Int
     init {
         fact = { if (it == 1) it else it * fact(it - 1) }
     }
@@ -25,7 +25,7 @@ class Ch4ExerciseTest {
             fun inc(n: Int): Int = n + 1
             fun dec(n: Int): Int = n - 1
 
-            tailrec fun add(a: Int, b:Int): Int = if (b <= 0) a else add(inc(a), dec(b))
+            tailrec fun add(a: Int, b: Int): Int = if (b <= 0) a else add(inc(a), dec(b))
 
             assertEquals(add(5, 10), 15)
         }
@@ -67,7 +67,7 @@ class Ch4ExerciseTest {
                 if (n <= 1) {
                     return BigInteger.ONE
                 }
-                var iter = n;
+                var iter = n
                 var val1 = BigInteger.ONE
                 var val2 = BigInteger.ONE
 
@@ -149,7 +149,6 @@ class Ch4ExerciseTest {
         @Test
         fun solve() {
 
-
             // my implementation.. some what clumsy
             fun <T> myMakeString(list: List<T>, delim: String): String {
                 tailrec fun <T> myMakeString(result: String, rest: List<T>): String = when (rest.size) {
@@ -204,11 +203,12 @@ class Ch4ExerciseTest {
                 else -> foldLeft(list.tail(), "${list.head()}") { a, b -> "$a$delim$b" }
             }
 
-            fun sum(list: List<Int>): Int = foldLeft(list, 0) {a, b -> a + b}
+            fun sum(list: List<Int>): Int = foldLeft(list, 0) { a, b -> a + b }
 
             assertEquals(
                 makeString(listOf("one", "two", "three"), ","),
-                "one,two,three")
+                "one,two,three"
+            )
 
             assertEquals(sum(listOf(1, 2, 3)), 6)
         }
@@ -255,7 +255,7 @@ class Ch4ExerciseTest {
     }
 
     fun <T> prepend(list: List<T>, elem: T): List<T> =
-        foldLeft(list, listOf(elem), {acc, each -> acc + each})
+        foldLeft(list, listOf(elem), { acc, each -> acc + each })
 
     @Nested
     inner class Ex08 {
@@ -304,7 +304,7 @@ class Ch4ExerciseTest {
                 val mutableList = mutableListOf<T>()
                 var elem = seed
 
-                while(p(elem)) {
+                while (p(elem)) {
                     mutableList.add(elem)
                     elem = f(elem)
                 }
@@ -326,7 +326,7 @@ class Ch4ExerciseTest {
                 val mutableList = mutableListOf<T>()
                 var elem = seed
 
-                while(p(elem)) {
+                while (p(elem)) {
                     mutableList.add(elem)
                     elem = f(elem)
                 }
@@ -437,7 +437,7 @@ class Ch4ExerciseTest {
                 fun <T> makeString(values: List<T>, delim: String): String = when {
                     values.isEmpty() -> ""
                     values.tail().isEmpty() -> values.head().toString()
-                    else -> values.head().toString() + foldLeft(values.tail(), "") { a, b -> "$a$delim$b"}
+                    else -> values.head().toString() + foldLeft(values.tail(), "") { a, b -> "$a$delim$b" }
                 }
 
                 return makeString(fib(0, BigInteger.ZERO, BigInteger.ONE, listOf(BigInteger.ONE)), ",")
@@ -490,7 +490,7 @@ class Ch4ExerciseTest {
 
         @Test
         fun solve() {
-            fun <T,U> map(list: List<T>, f: (T) -> U): List<U> {
+            fun <T, U> map(list: List<T>, f: (T) -> U): List<U> {
                 tailrec fun map(list: List<T>, acc: List<U>): List<U> =
                     if (list.isEmpty())
                         acc
@@ -500,13 +500,13 @@ class Ch4ExerciseTest {
                 return map(list, listOf())
             }
 
-            assertEquals(map(listOf(1, 2 ,3), Int::toString), listOf("1", "2", "3"))
+            assertEquals(map(listOf(1, 2, 3), Int::toString), listOf("1", "2", "3"))
 
             // holy... such a powerful foldLeft(=reduce)
-            fun <T,U> mapReusingFoldLeft(list: List<T>, f: (T) -> U): List<U>
-                = foldLeft(list, listOf()) {acc, elem -> acc + f(elem)}
+            fun <T, U> mapReusingFoldLeft(list: List<T>, f: (T) -> U): List<U> =
+                foldLeft(list, listOf()) { acc, elem -> acc + f(elem) }
 
-            assertEquals(mapReusingFoldLeft(listOf(1, 2 ,3), Int::toString), listOf("1", "2", "3"))
+            assertEquals(mapReusingFoldLeft(listOf(1, 2, 3), Int::toString), listOf("1", "2", "3"))
         }
     }
 
@@ -518,13 +518,13 @@ class Ch4ExerciseTest {
         return iterate(listOf(), seed, n)
     }
 
-    fun <T,U> map(list: List<T>, f: (T) -> U): List<U>
-            = foldLeft(list, listOf()) {acc, elem -> acc + f(elem)}
+    fun <T, U> map(list: List<T>, f: (T) -> U): List<U> =
+        foldLeft(list, listOf()) { acc, elem -> acc + f(elem) }
 
     fun <T> makeString(values: List<T>, delim: String): String = when {
         values.isEmpty() -> ""
         values.tail().isEmpty() -> values.head().toString()
-        else -> values.head().toString() + foldLeft(values.tail(), "") { a, b -> "$a$delim$b"}
+        else -> values.head().toString() + foldLeft(values.tail(), "") { a, b -> "$a$delim$b" }
     }
 
     @Nested
@@ -534,11 +534,11 @@ class Ch4ExerciseTest {
         fun solve() {
             // my implementation
             fun fibCorecursive(n: Int): String {
-                fun fib(n: Int): List<Pair<BigInteger, BigInteger>>
-                        = iterate(Pair(BigInteger.ONE, BigInteger.ONE), { Pair(it.second, it.first + it.second) }, n + 1)
+                fun fib(n: Int): List<Pair<BigInteger, BigInteger>> =
+                    iterate(Pair(BigInteger.ONE, BigInteger.ONE), { Pair(it.second, it.first + it.second) }, n + 1)
 
-                fun fromFibsToString(fibs: List<Pair<BigInteger, BigInteger>>): String
-                        = makeString(map(fibs) { it.first }, ",")
+                fun fromFibsToString(fibs: List<Pair<BigInteger, BigInteger>>): String =
+                    makeString(map(fibs) { it.first }, ",")
 
                 return fromFibsToString(fib(n))
             }
