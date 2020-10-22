@@ -1,66 +1,16 @@
 package chap6
 
-import chap5.Ch5ExercisesTest.List
+import util.List
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import util.Option
 import java.lang.RuntimeException
 import kotlin.math.pow
 import kotlin.test.assertEquals
 import kotlin.collections.List as ListStandard
 
 class Ch6ExercisesTest {
-
-    sealed class Option<out A> {
-
-        abstract fun isEmpty(): Boolean
-
-        abstract fun <B> map(f: (A) -> B): Option<B>
-
-        fun getOrElse(default: @UnsafeVariance A): A = when (this) {
-            None -> default
-            is Some -> this.value
-        }
-
-        fun getOrElse(default: () -> @UnsafeVariance A): A = when (this) {
-            None -> default()
-            is Some -> this.value
-        }
-
-        fun <B> flatMap(f: (A) -> Option<B>): Option<B> = this.map(f).getOrElse(None)
-
-        fun orElse(default: () -> Option<@UnsafeVariance A>): Option<A> = map { this }.getOrElse(default)
-
-        fun filter(p: (A) -> Boolean): Option<A> = flatMap { if (p(it)) this else None }
-
-        internal object None : Option<Nothing>() {
-
-            override fun isEmpty(): Boolean = true
-
-            override fun toString(): String = "None"
-
-            override fun equals(other: Any?): Boolean = other === None
-
-            override fun hashCode(): Int = 0
-
-            override fun <B> map(f: (Nothing) -> B): Option<B> = None
-        }
-
-        internal data class Some<out A>(internal val value: A) : Option<A>() {
-
-            override fun isEmpty() = false
-
-            override fun <B> map(f: (A) -> B): Option<B> = Some(f(this.value))
-        }
-
-        companion object {
-
-            operator fun <A> invoke(a: A? = null): Option<A> = when (a) {
-                null -> None
-                else -> Some(a)
-            }
-        }
-    }
 
     @Nested
     inner class Ex01 {
@@ -208,18 +158,18 @@ class Ch6ExercisesTest {
         oa.flatMap { a -> ob.map { b -> f(a)(b) } }
 
     fun <A, B, C, D> map3(
-        oa: Option<A>,
-        ob: Option<B>,
-        oc: Option<C>,
-        f: (A) -> (B) -> (C) -> D
+            oa: Option<A>,
+            ob: Option<B>,
+            oc: Option<C>,
+            f: (A) -> (B) -> (C) -> D
     ): Option<D> = oa.flatMap { a -> ob.flatMap { b -> oc.map { c -> f(a)(b)(c) } } }
 
     fun <A, B, C, D, E> map4(
-        oa: Option<A>,
-        ob: Option<B>,
-        oc: Option<C>,
-        od: Option<D>,
-        f: (A) -> (B) -> (C) -> (D) -> E
+            oa: Option<A>,
+            ob: Option<B>,
+            oc: Option<C>,
+            od: Option<D>,
+            f: (A) -> (B) -> (C) -> (D) -> E
     ): Option<E> = oa.flatMap { a -> ob.flatMap { b -> oc.flatMap { c -> od.map { d -> f(a)(b)(c)(d) } } } }
 
     @Nested
