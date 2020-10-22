@@ -5,11 +5,13 @@ import java.lang.RuntimeException
 sealed class List<A> {
     abstract fun isEmpty(): Boolean
     abstract fun lengthMemoized(): Int
+    abstract fun headSafe(): Result<A>
 
     internal object Nil : List<Nothing>() {
         override fun isEmpty(): Boolean = true
         override fun toString(): String = "[NIL]"
         override fun lengthMemoized(): Int = 0
+        override fun headSafe(): Result<Nothing> = Result()
     }
 
     // Cons means Construct.
@@ -24,6 +26,8 @@ sealed class List<A> {
         override fun toString(): String = "[${toString("", this)}NIL]"
 
         override fun lengthMemoized(): Int = length
+
+        override fun headSafe(): Result<A> = Result(head)
 
         private tailrec fun toString(acc: String, list: List<A>): String = when (list) {
             is Nil -> acc
