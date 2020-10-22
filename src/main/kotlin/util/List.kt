@@ -4,10 +4,12 @@ import java.lang.RuntimeException
 
 sealed class List<A> {
     abstract fun isEmpty(): Boolean
+    abstract fun lengthMemoized(): Int
 
     internal object Nil : List<Nothing>() {
         override fun isEmpty(): Boolean = true
         override fun toString(): String = "[NIL]"
+        override fun lengthMemoized(): Int = 0
     }
 
     // Cons means Construct.
@@ -15,10 +17,13 @@ sealed class List<A> {
         val head: A,
         val tail: List<A>
     ) : List<A>() {
+        private val length = tail.lengthMemoized() + 1
 
         override fun isEmpty(): Boolean = false
 
         override fun toString(): String = "[${toString("", this)}NIL]"
+
+        override fun lengthMemoized(): Int = length
 
         private tailrec fun toString(acc: String, list: List<A>): String = when (list) {
             is Nil -> acc
