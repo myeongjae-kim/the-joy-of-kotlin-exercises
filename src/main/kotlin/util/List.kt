@@ -1,6 +1,7 @@
 package util
 
 import java.lang.RuntimeException
+import util.Result
 
 sealed class List<A> {
     abstract fun isEmpty(): Boolean
@@ -58,6 +59,8 @@ sealed class List<A> {
     fun filter(p: (A) -> Boolean) = filter(this, p)
     fun <B> flatMap(f: (A) -> List<B>) = flatMap(this, f)
     fun filterViaFlatMap(p: (A) -> Boolean) = filterViaFlatMap(this, p)
+
+    fun lastSafe(): Result<A> = Companion.lastSafe(this)
 
     companion object {
 
@@ -150,5 +153,7 @@ sealed class List<A> {
 
         fun <A> filterViaFlatMap(list: List<A>, p: (A) -> Boolean): List<A> =
             list.flatMap { if (p(it)) List(it) else invoke() }
+
+        fun <A> lastSafe(list: List<A>): Result<A> = list.foldLeft(Result()) { { elem -> Result(elem) } }
     }
 }
