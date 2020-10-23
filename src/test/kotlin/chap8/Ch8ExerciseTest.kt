@@ -42,4 +42,34 @@ class Ch8ExerciseTest {
             assertEquals(list.lastSafe().getOrElse(999), 2)
         }
     }
+
+    // Problem 8.4 is meaningless...
+
+    // 8.5 my implementation
+    fun <A> flattenResult(list: List<Result<A>>): List<A> = list.coFoldRight(List()) { elem ->
+        { acc ->
+            when (elem) {
+                is Result.Success -> acc.cons(elem.value)
+                else -> acc
+            }
+        }
+    }
+
+    // book's implementation
+    fun <A> flattenResult2(list: List<Result<A>>): List<A> = list.flatMap { result ->
+        result.map { List(it) }.getOrElse(List())
+    }
+
+    @Nested
+    inner class Ex05 {
+        @Test
+        fun solve() {
+            val expected = "[1, 2, 4, NIL]"
+            val list = List(Result(1), Result(2), Result(), Result(4))
+
+            assertEquals(flattenResult(list).toString(), expected)
+            assertEquals(flattenResult2(list).toString(), expected)
+        }
+    }
+
 }
