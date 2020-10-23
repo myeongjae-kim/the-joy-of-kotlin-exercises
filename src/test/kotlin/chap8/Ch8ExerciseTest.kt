@@ -72,22 +72,44 @@ class Ch8ExerciseTest {
         }
     }
 
-    fun <A> sequence(list: List<Result<A>>): Result<List<A>> =
-        list.coFoldRight(Result(List())) { elem ->
-            { acc ->
-                acc.flatMap { list -> elem.map { list.cons(it) } }
-            }
-        }
-
-
     @Nested
     inner class Ex06 {
+        fun <A> sequence(list: List<Result<A>>): Result<List<A>> =
+                list.coFoldRight(Result(List())) { elem ->
+                    { acc ->
+                        acc.flatMap { list -> elem.map { list.cons(it) } }
+                    }
+                }
+
         @Test
         fun solve() {
             val expected = "Empty"
             val list = List(Result(1), Result(2), Result(), Result(4))
 
             assertEquals(sequence(list).toString(), expected)
+            assertEquals(sequence(List(Result(1), Result(2))).toString(), "Success([1, 2, NIL])")
+        }
+    }
+
+    fun <A> sequence(list: List<Result<A>>): Result<List<A>> = traverse(list) { it }
+
+    fun <A, B> traverse(list: List<A>, f: (A) -> Result<B>): Result<List<B>> =
+        list.coFoldRight(Result(List())) { elem: A ->
+            { acc: Result<List<B>> ->
+                acc.flatMap { list -> f(elem).map { list.cons(it) } }
+            }
+        }
+
+    @Nested
+    inner class Ex07 {
+
+        @Test
+        fun solve() {
+            val expected = "Empty"
+            val list = List(Result(1), Result(2), Result(), Result(4))
+
+            assertEquals(sequence(list).toString(), expected)
+            assertEquals(sequence(List(Result(1), Result(2))).toString(), "Success([1, 2, NIL])")
         }
     }
 }
