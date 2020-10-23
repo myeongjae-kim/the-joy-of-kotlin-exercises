@@ -72,4 +72,22 @@ class Ch8ExerciseTest {
         }
     }
 
+    fun <A> sequence(list: List<Result<A>>): Result<List<A>> =
+        list.coFoldRight(Result(List())) { elem ->
+            { acc ->
+                acc.flatMap { list -> elem.map { list.cons(it) } }
+            }
+        }
+
+
+    @Nested
+    inner class Ex06 {
+        @Test
+        fun solve() {
+            val expected = "Empty"
+            val list = List(Result(1), Result(2), Result(), Result(4))
+
+            assertEquals(sequence(list).toString(), expected)
+        }
+    }
 }
