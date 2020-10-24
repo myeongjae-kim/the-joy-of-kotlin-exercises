@@ -167,7 +167,7 @@ class Ch4ExerciseTest {
             fun <T> makeString(list: List<T>, delim: String): String {
                 tailrec fun <T> makeString_(list: List<T>, acc: String): String = when {
                     list.isEmpty() -> acc
-                    acc.isEmpty() -> makeString_(list.tail(), "${list.head()}")
+                    acc.isEmpty -> makeString_(list.tail(), "${list.head()}")
                     else -> makeString_(list.tail(), "$acc$delim${list.head()}")
                 }
 

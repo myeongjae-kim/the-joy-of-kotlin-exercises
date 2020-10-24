@@ -213,4 +213,16 @@ class Ch8ExerciseTest {
             assert(List<Int>().hasSubList(List()))
         }
     }
+
+    @Nested
+    inner class Ex17 {
+        @Test
+        fun solve() {
+            val list = List(1, 2, 3, 4, 5)
+            val grouped = list.groupBy { it and 1 }
+
+            assert(grouped[0]?.equals(List(2, 4)) ?: false)
+            assert(grouped[1]?.equals(List(1, 3, 5)) ?: false)
+        }
+    }
 }

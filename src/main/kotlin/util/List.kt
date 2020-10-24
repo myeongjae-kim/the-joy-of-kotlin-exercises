@@ -72,6 +72,7 @@ sealed class List<A> {
     fun splitAt(index: Int) = splitAt(this, index)
     fun startsWith(subList: List<A>) = startsWith(this, subList)
     fun hasSubList(subList: List<A>) = hasSubList(this, subList)
+    fun <B> groupBy(f: (A) -> B) = groupBy(this, f)
 
     override fun equals(other: Any?): Boolean {
         tailrec fun equals(list1: List<A>, list2: List<*>): Boolean = when {
@@ -247,6 +248,15 @@ sealed class List<A> {
                 else when (list) {
                     Nil -> subList.isEmpty()
                     is Cons<A> -> hasSubList(list.tail, subList)
+                }
+
+        fun <A, B> groupBy(list: List<A>, f: (A) -> B): Map<B, List<A>> =
+                list.coFoldRight(mapOf()) { elem ->
+                    { acc ->
+                        f(elem).let { k ->
+                            acc + (k to (acc[k] ?: invoke()).cons(elem))
+                        }
+                    }
                 }
     }
 }
