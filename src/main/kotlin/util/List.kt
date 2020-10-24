@@ -61,6 +61,13 @@ sealed class List<A> {
 
     fun lastSafe(): Result<A> = Companion.lastSafe(this)
 
+    fun <A1, A2> unzip(f: (A) -> Pair<A1, A2>): Pair<List<A1>, List<A2>> =
+            coFoldRight(Pair(invoke(), invoke())) { elem ->
+                { acc ->
+                    f(elem).let { Pair(acc.first.cons(it.first), acc.second.cons(it.second)) }
+                }
+            }
+
     companion object {
 
         @Suppress("UNCHECKED_CAST")
@@ -164,5 +171,9 @@ sealed class List<A> {
             return zipWith(invoke(), list1, list2)
         }
 
+        fun <A, B, C> product(list1: List<A>, list2: List<B>, f: (A) -> (B) -> C): List<C> =
+            list1.flatMap { x -> list2.map { y -> f(x)(y) } }
+
+        fun <A, B> unzip(list: List<Pair<A, B>>): Pair<List<A>, List<B>> = list.unzip { it }
     }
 }

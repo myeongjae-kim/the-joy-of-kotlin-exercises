@@ -128,4 +128,31 @@ class Ch8ExerciseTest {
             assertEquals(result.toString(), "[5, 7, 9, NIL]")
         }
     }
+
+    @Nested
+    inner class Ex09 {
+
+        @Test
+        fun solve() {
+            val list1 = List(1, 2)
+            val list2 = List(3, 4, 5)
+
+            val result = List.product(list1, list2) { a ->
+                { b -> "$a$b" }
+            }
+
+            assertEquals(result.toString(), "[13, 14, 15, 23, 24, 25, NIL]")
+        }
+    }
+
+    @Nested
+    inner class Ex10 {
+
+        @Test
+        fun solve() {
+            val list: List<Pair<Int, Int>> = List(Pair(1, 2), Pair(3, 4))
+
+            assertEquals(List.unzip(list).toString(), "([1, 3, NIL], [2, 4, NIL])")
+        }
+    }
 }
