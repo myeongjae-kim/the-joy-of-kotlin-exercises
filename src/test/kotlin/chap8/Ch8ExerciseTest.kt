@@ -146,13 +146,27 @@ class Ch8ExerciseTest {
     }
 
     @Nested
-    inner class Ex10 {
+    inner class Ex11 {
 
         @Test
         fun solve() {
             val list: List<Pair<Int, Int>> = List(Pair(1, 2), Pair(3, 4))
 
             assertEquals(List.unzip(list).toString(), "([1, 3, NIL], [2, 4, NIL])")
+        }
+    }
+
+    @Nested
+    inner class Ex12 {
+
+        @Test
+        fun solve() {
+            val list = List(1, 2, 3)
+
+            assertEquals(list.getAt(0).toString(), "Success(1)")
+            assertEquals(list.getAt(1).toString(), "Success(2)")
+            assertEquals(list.getAt(2).toString(), "Success(3)")
+            assertEquals(list.getAt(3).toString(), "Failure(Index out of bound)")
         }
     }
 }

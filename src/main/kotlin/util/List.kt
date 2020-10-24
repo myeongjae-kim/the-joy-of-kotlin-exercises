@@ -68,6 +68,8 @@ sealed class List<A> {
                 }
             }
 
+    fun getAt(index: Int) = Companion.getAt(this, index)
+
     companion object {
 
         @Suppress("UNCHECKED_CAST")
@@ -175,5 +177,18 @@ sealed class List<A> {
             list1.flatMap { x -> list2.map { y -> f(x)(y) } }
 
         fun <A, B> unzip(list: List<Pair<A, B>>): Pair<List<A>, List<B>> = list.unzip { it }
+
+        fun <A> getAt(list: List<A>, index: Int): Result<A> {
+            tailrec fun getAt(list: Cons<A>, index: Int): Result<A> =
+                if (index == 0)
+                    Result(list.head)
+                else
+                    getAt(list.tail as Cons, index - 1)
+
+            return if (index < 0 || index >= list.length())
+                Result.failure("Index out of bound")
+            else
+                getAt(list as Cons<A>, index)
+        }
     }
 }

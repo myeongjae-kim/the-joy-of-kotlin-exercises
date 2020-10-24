@@ -111,11 +111,11 @@ sealed class Result<out A> : Serializable {
                 else -> Failure(IllegalStateException("Argument $a does not match condition: $message"))
             }
         }
-    }
 
-    fun <A> failure(message: String): Result<A> = Failure(IllegalStateException(message))
-    fun <A> failure(exception: RuntimeException): Result<A> = Failure(exception)
-    fun <A> failure(exception: Exception): Result<A> = Failure(IllegalStateException(exception))
+        fun <A> failure(message: String): Result<A> = Failure(IllegalStateException(message))
+        fun <A> failure(exception: RuntimeException): Result<A> = Failure(exception)
+        fun <A> failure(exception: Exception): Result<A> = Failure(IllegalStateException(exception))
+    }
 
     fun getOrElse(defaultValue: @UnsafeVariance A): A = when (this) {
         is Success -> this.value
