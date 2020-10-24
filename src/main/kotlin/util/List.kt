@@ -76,6 +76,7 @@ sealed class List<A> {
     fun hasSubList(subList: List<A>) = hasSubList(this, subList)
     fun <B> groupBy(f: (A) -> B) = groupBy(this, f)
     fun exists(p: (A) -> Boolean) = exists(this, p)
+    fun forAll(p: (A) -> Boolean) = forAll(this, p)
 
     override fun equals(other: Any?): Boolean {
         tailrec fun equals(list1: List<A>, list2: List<*>): Boolean = when {
@@ -274,6 +275,13 @@ sealed class List<A> {
                 list.foldLeft(identity = false, zero = true) { acc ->
                     { elem ->
                         acc || p(elem)
+                    }
+                }
+
+        fun <A> forAll(list: List<A>, p: (A) -> Boolean): Boolean =
+                list.foldLeft(identity = true, zero = false) { acc ->
+                    { elem ->
+                        acc && p(elem)
                     }
                 }
     }

@@ -257,4 +257,13 @@ class Ch8ExerciseTest {
             assert(!List(1, 2).exists { it == 3 })
         }
     }
+
+    @Nested
+    inner class Ex21 {
+        @Test
+        fun solve() {
+            assert(List(1, 3, 5).forAll { it and 1 == 1 })
+            assert(!List(1, 3, 5, 6).forAll { it and 1 == 1 })
+        }
+    }
 }
