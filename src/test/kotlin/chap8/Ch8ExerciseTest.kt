@@ -248,4 +248,13 @@ class Ch8ExerciseTest {
             assertEquals(range(0, 3), List(0, 1, 2))
         }
     }
+
+    @Nested
+    inner class Ex20 {
+        @Test
+        fun solve() {
+            assert(List(1, 2).exists { it == 1 })
+            assert(!List(1, 2).exists { it == 3 })
+        }
+    }
 }

@@ -48,6 +48,8 @@ sealed class List<A> {
 
     fun <B> foldLeft(identity: B, f: (B) -> (A) -> B) = foldLeft(identity, this, f)
 
+    fun <B> foldLeft(identity: B, zero: B, f: (B) -> (A) -> B) = foldLeft(identity, zero, this, f)
+
     fun <B> foldRightViaFoldLeft(identity: B, f: (A) -> (B) -> B) =
         this.reverse().foldLeft(identity, { b -> { a -> f(a)(b) } })
 
@@ -73,6 +75,7 @@ sealed class List<A> {
     fun startsWith(subList: List<A>) = startsWith(this, subList)
     fun hasSubList(subList: List<A>) = hasSubList(this, subList)
     fun <B> groupBy(f: (A) -> B) = groupBy(this, f)
+    fun exists(p: (A) -> Boolean) = exists(this, p)
 
     override fun equals(other: Any?): Boolean {
         tailrec fun equals(list1: List<A>, list2: List<*>): Boolean = when {
@@ -161,6 +164,14 @@ sealed class List<A> {
         tailrec fun <A, B> foldLeft(acc: B, list: List<A>, f: (B) -> (A) -> B): B = when (list) {
             Nil -> acc
             is Cons<A> -> foldLeft(f(acc)(list.head), list.tail, f)
+        }
+
+        tailrec fun <A, B> foldLeft(acc: B, zero: B, list: List<A>, f: (B) -> (A) -> B): B = when (list) {
+            Nil -> acc
+            is Cons<A> -> if (acc == zero)
+                acc
+            else
+                foldLeft(f(acc)(list.head), zero, list.tail, f)
         }
 
         private tailrec fun <A, B> coFoldRight(acc: B, list: List<A>, identity: B, f: (A) -> (B) -> B): B = when (list) {
@@ -256,6 +267,13 @@ sealed class List<A> {
                         f(elem).let { k ->
                             acc + (k to (acc[k] ?: invoke()).cons(elem))
                         }
+                    }
+                }
+
+        fun <A> exists(list: List<A>, p: (A) -> Boolean): Boolean =
+                list.foldLeft(identity = false, zero = true) { acc ->
+                    { elem ->
+                        acc || p(elem)
                     }
                 }
     }
