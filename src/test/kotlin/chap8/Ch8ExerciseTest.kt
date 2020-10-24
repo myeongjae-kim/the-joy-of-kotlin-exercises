@@ -169,4 +169,24 @@ class Ch8ExerciseTest {
             assertEquals(list.getAt(3).toString(), "Failure(Index out of bound)")
         }
     }
+
+    @Nested
+    inner class Ex14 {
+        @Test
+        fun solve() {
+            val list = List(1, 2)
+
+            val result0 = list.splitAt(-1)
+            val result1 = list.splitAt(0)
+            val result2 = list.splitAt(1)
+            val result3 = list.splitAt(2)
+            val result4 = list.splitAt(3)
+
+            assertEquals(result0.toString(), "([NIL], [1, 2, NIL])")
+            assertEquals(result1.toString(), "([NIL], [1, 2, NIL])")
+            assertEquals(result2.toString(), "([1, NIL], [2, NIL])")
+            assertEquals(result3.toString(), "([1, 2, NIL], [NIL])")
+            assertEquals(result4.toString(), "([1, 2, NIL], [NIL])")
+        }
+    }
 }

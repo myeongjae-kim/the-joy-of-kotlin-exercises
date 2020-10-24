@@ -69,6 +69,7 @@ sealed class List<A> {
             }
 
     fun getAt(index: Int) = Companion.getAt(this, index)
+    fun splitAt(index: Int) = Companion.splitAt(this, index)
 
     companion object {
 
@@ -189,6 +190,19 @@ sealed class List<A> {
                 Result.failure("Index out of bound")
             else
                 getAt(list as Cons<A>, index)
+        }
+
+        fun <A> splitAt(list: List<A>, index: Int): Pair<List<A>, List<A>> {
+            tailrec fun splitAt(list: List<A>, i: Int, acc: Pair<List<A>, List<A>>): Pair<List<A>, List<A>> = when (list) {
+                Nil -> acc
+                is Cons -> if (i > 0)
+                    splitAt(list.tail, i - 1, Pair(acc.first.cons(list.head), acc.second))
+                else
+                    Pair(acc.first, list)
+            }
+
+            return splitAt(list, index, Pair(invoke(), invoke()))
+                    .let { Pair(it.first.reverse(), it.second) }
         }
     }
 }
