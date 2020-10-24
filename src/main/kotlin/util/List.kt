@@ -68,15 +68,39 @@ sealed class List<A> {
                 }
             }
 
-    fun getAt(index: Int) = Companion.getAt(this, index)
-    fun splitAt(index: Int) = Companion.splitAt(this, index)
+    fun getAt(index: Int) = getAt(this, index)
+    fun splitAt(index: Int) = splitAt(this, index)
+    fun startsWith(subList: List<A>) = startsWith(this, subList)
+    fun hasSubList(subList: List<A>) = hasSubList(this, subList)
+
+    override fun equals(other: Any?): Boolean {
+        tailrec fun equals(list1: List<A>, list2: List<*>): Boolean = when {
+            list1 is Nil && list2 is Nil -> true
+            list1 is Cons<A> && list2 is Cons<*> ->
+                if (list1.head == list2.head)
+                    equals(list1.tail, list2.tail)
+                else
+                    false
+
+            else -> false
+        }
+
+        return when(other) {
+            is List<*> -> equals(this, other)
+            else -> false
+        }
+    }
+
+    override fun hashCode(): Int {
+        return javaClass.hashCode()
+    }
 
     companion object {
 
         @Suppress("UNCHECKED_CAST")
         operator
         fun <A> invoke(vararg az: A): List<A> =
-            az.foldRight(Nil as List<A>, { elem, acc -> Cons(elem, acc) })
+                az.foldRight(Nil as List<A>, { elem, acc -> Cons(elem, acc) })
 
         fun <A> cons(list: List<A>, elem: A): List<A> = Cons(elem, list)
 
@@ -102,14 +126,14 @@ sealed class List<A> {
 
         // efficient but not stack-safe
         fun <A> concatViaFoldRight(list1: List<A>, list2: List<A>): List<A> =
-            list1.foldRight(list2, { elem -> { acc -> acc.cons(elem) } })
+                list1.foldRight(list2, { elem -> { acc -> acc.cons(elem) } })
 
         // stack-safe
         fun <A> concatViaCoFoldRight(list1: List<A>, list2: List<A>): List<A> =
-            list1.coFoldRight(list2, { elem -> { acc -> acc.cons(elem) } })
+                list1.coFoldRight(list2, { elem -> { acc -> acc.cons(elem) } })
 
         fun <A> concatViaFoldLeft(list1: List<A>, list2: List<A>): List<A> =
-            list1.reverse().foldLeft(list2, { acc -> { elem -> acc.cons(elem) } })
+                list1.reverse().foldLeft(list2, { acc -> { elem -> acc.cons(elem) } })
 
         // my implementation. Not corecursive and not reusing objects...
         fun <A> myInit(list: List<A>): List<A> = when (list) {
@@ -122,7 +146,7 @@ sealed class List<A> {
         }
 
         fun <A> reverse(list: List<A>): List<A> =
-            list.foldLeft(invoke(), { acc -> { elem -> acc.cons(elem) } })
+                list.foldLeft(invoke(), { acc -> { elem -> acc.cons(elem) } })
 
         fun <A> init(list: List<A>): List<A> = list.reverse().drop(1).reverse()
 
@@ -144,24 +168,24 @@ sealed class List<A> {
         }
 
         fun <A> flatten(lists: List<List<A>>): List<A> =
-            lists.foldLeft(invoke()) { acc -> acc::concat }
+                lists.foldLeft(invoke()) { acc -> acc::concat }
 
         fun <A, B> map(list: List<A>, f: (A) -> B): List<B> = list.coFoldRight(invoke(), { elem -> { acc -> acc.cons(f(elem)) } })
 
         fun <A> filter(list: List<A>, p: (A) -> Boolean): List<A> = list.coFoldRight(
-            invoke(),
-            { elem ->
-                { acc ->
-                    if (p(elem)) acc.cons(elem)
-                    else acc
+                invoke(),
+                { elem ->
+                    { acc ->
+                        if (p(elem)) acc.cons(elem)
+                        else acc
+                    }
                 }
-            }
         )
 
         fun <A, B> flatMap(list: List<A>, f: (A) -> List<B>): List<B> = flatten(list.map(f))
 
         fun <A> filterViaFlatMap(list: List<A>, p: (A) -> Boolean): List<A> =
-            list.flatMap { if (p(it)) List(it) else invoke() }
+                list.flatMap { if (p(it)) List(it) else invoke() }
 
         fun <A> lastSafe(list: List<A>): Result<A> = list.foldLeft(Result()) { { elem -> Result(elem) } }
 
@@ -175,16 +199,16 @@ sealed class List<A> {
         }
 
         fun <A, B, C> product(list1: List<A>, list2: List<B>, f: (A) -> (B) -> C): List<C> =
-            list1.flatMap { x -> list2.map { y -> f(x)(y) } }
+                list1.flatMap { x -> list2.map { y -> f(x)(y) } }
 
         fun <A, B> unzip(list: List<Pair<A, B>>): Pair<List<A>, List<B>> = list.unzip { it }
 
         fun <A> getAt(list: List<A>, index: Int): Result<A> {
             tailrec fun getAt(list: Cons<A>, index: Int): Result<A> =
-                if (index == 0)
-                    Result(list.head)
-                else
-                    getAt(list.tail as Cons, index - 1)
+                    if (index == 0)
+                        Result(list.head)
+                    else
+                        getAt(list.tail as Cons, index - 1)
 
             return if (index < 0 || index >= list.length())
                 Result.failure("Index out of bound")
@@ -204,5 +228,25 @@ sealed class List<A> {
             return splitAt(list, index, Pair(invoke(), invoke()))
                     .let { Pair(it.first.reverse(), it.second) }
         }
+
+        tailrec fun <A> startsWith(list: List<A>, subList: List<A>): Boolean = when {
+            subList is Nil -> true
+
+            list is Cons<A> && subList is Cons<A> ->
+                if (list.head == subList.head)
+                    startsWith(list.tail, subList.tail)
+                else
+                    false
+
+            else -> false
+        }
+
+        tailrec fun <A> hasSubList(list: List<A>, subList: List<A>): Boolean =
+                if (list.startsWith(subList))
+                    true
+                else when (list) {
+                    Nil -> subList.isEmpty()
+                    is Cons<A> -> hasSubList(list.tail, subList)
+                }
     }
 }

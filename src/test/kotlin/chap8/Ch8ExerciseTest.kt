@@ -189,4 +189,28 @@ class Ch8ExerciseTest {
             assertEquals(result4.toString(), "([1, 2, NIL], [NIL])")
         }
     }
+
+    @Nested
+    inner class Ex16 {
+        @Test
+        fun solve() {
+            assert(List(1, 2) == List(1, 2))
+            assert(List(1, 2) != List(1))
+            assert(List('a', 'b') != List(1))
+
+            assert(List(1, 2).startsWith(List(1)))
+            assert(!List(1, 2).startsWith(List(2)))
+            assert(List(1, 2).startsWith(List()))
+            assert(List<Int>().startsWith(List()))
+            assert(!List<Int>().startsWith(List(1)))
+
+            assert(List(1, 2, 3).hasSubList(List(1, 2)))
+            assert(List(1, 2, 3).hasSubList(List(2, 3)))
+            assert(List(1, 2, 3).hasSubList(List(1)))
+            assert(List(1, 2, 3).hasSubList(List(2)))
+            assert(List(1, 2, 3).hasSubList(List(3)))
+            assert(!List(1, 2, 3).hasSubList(List(1, 3)))
+            assert(List<Int>().hasSubList(List()))
+        }
+    }
 }
