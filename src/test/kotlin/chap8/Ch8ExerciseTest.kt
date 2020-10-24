@@ -2,9 +2,9 @@ package chap8
 
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import util.*
 import util.List
 import kotlin.test.assertEquals
-import util.Result
 
 class Ch8ExerciseTest {
 
@@ -223,6 +223,29 @@ class Ch8ExerciseTest {
 
             assert(grouped[0]?.equals(List(2, 4)) ?: false)
             assert(grouped[1]?.equals(List(1, 3, 5)) ?: false)
+        }
+    }
+
+    @Nested
+    inner class Ex18 {
+        @Test
+        fun solve() {
+            val result = unfold(0) { i ->
+                if (i < 10)
+                    Option(Pair(i, i + 1))
+                else
+                    Option()
+            }
+
+            assertEquals(result, List(0, 1, 2, 3, 4, 5, 6, 7, 8, 9))
+        }
+    }
+
+    @Nested
+    inner class Ex19 {
+        @Test
+        fun solve() {
+            assertEquals(range(0, 3), List(0, 1, 2))
         }
     }
 }
