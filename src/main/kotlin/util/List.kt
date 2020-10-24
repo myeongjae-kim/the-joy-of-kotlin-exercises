@@ -77,6 +77,9 @@ sealed class List<A> {
     fun <B> groupBy(f: (A) -> B) = groupBy(this, f)
     fun exists(p: (A) -> Boolean) = exists(this, p)
     fun forAll(p: (A) -> Boolean) = forAll(this, p)
+    fun splitListAt(index: Int): List<List<A>> = Companion.splitListAt(this, index)
+    fun myDivide(depth: Int) = Companion.myDivide(this, depth)
+    fun divide(depth: Int) = Companion.divide(this, depth)
 
     override fun equals(other: Any?): Boolean {
         tailrec fun equals(list1: List<A>, list2: List<*>): Boolean = when {
@@ -241,6 +244,53 @@ sealed class List<A> {
             return splitAt(list, index, Pair(invoke(), invoke()))
                     .let { Pair(it.first.reverse(), it.second) }
         }
+
+        fun <A> splitListAt(list: List<A>, index: Int): List<List<A>> {
+            tailrec fun splitListAt(acc: List<A>, list: List<A>, i: Int): List<List<A>> = when (list) {
+                Nil -> List(acc.reverse(), list)
+                is Cons -> if (i > 0)
+                    splitListAt(acc.cons(list.head), list.tail, i - 1)
+                else
+                    List(acc.reverse(), list)
+            }
+
+            return splitListAt(invoke(), list, index)
+        }
+
+        // my implementation... clumsy.
+        fun <A> myDivide(list: List<A>, depth: Int): List<List<A>> {
+            if (list.isEmpty()) return invoke()
+
+            return if (depth > 0) {
+                when(val split = list.splitListAt(list.lengthMemoized() / 2)) {
+                    is Cons -> myDivide(split.head, depth - 1).concat(
+                            if (split.tail is Cons)
+                                myDivide(split.tail.head, depth - 1)
+                            else
+                                split.tail)
+                    else -> split
+                }
+            } else {
+                List(list)
+            }
+        }
+
+        fun <A> divide(list: List<A>, depth: Int): List<List<A>> {
+            tailrec fun divide(list: List<List<A>>, depth: Int): List<List<A>> = when(list) {
+                is Cons ->
+                    if (depth > 0 && list.head.length() > 1)
+                        divide(list.flatMap { it.splitListAt(it.lengthMemoized() / 2) }, depth - 1)
+                    else
+                        list
+                else -> list // dead code
+            }
+
+            return if (list.isEmpty())
+                invoke()
+            else
+                divide(List(list), depth)
+        }
+
 
         tailrec fun <A> startsWith(list: List<A>, subList: List<A>): Boolean = when {
             subList is Nil -> true

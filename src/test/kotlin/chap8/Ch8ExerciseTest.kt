@@ -266,4 +266,40 @@ class Ch8ExerciseTest {
             assert(!List(1, 3, 5, 6).forAll { it and 1 == 1 })
         }
     }
+
+    @Nested
+    inner class Ex22 {
+        @Test
+        fun solve() {
+            assertEquals(
+                    "[[1, 2, NIL], [3, 4, NIL], NIL]",
+                    List(1, 2, 3, 4).splitListAt(2).toString())
+
+            // my implementation
+            assertEquals(
+                    "[[1, 2, NIL], [3, 4, NIL], [5, 6, NIL], [7, 8, NIL], NIL]",
+                    List(1, 2, 3, 4, 5, 6, 7, 8).myDivide(2).toString())
+
+            assertEquals(
+                    "[[1, NIL], [2, NIL], [3, NIL], [4, NIL], NIL]",
+                    List(1, 2, 3, 4).myDivide(100).toString())
+
+            assertEquals(
+                    "[NIL]",
+                    List<Int>().myDivide(2).toString())
+
+            // book's implementation
+            assertEquals(
+                    "[[1, 2, NIL], [3, 4, NIL], [5, 6, NIL], [7, 8, NIL], NIL]",
+                    List(1, 2, 3, 4, 5, 6, 7, 8).divide(2).toString())
+
+            assertEquals(
+                    "[[1, NIL], [2, NIL], [3, NIL], [4, NIL], NIL]",
+                    List(1, 2, 3, 4).divide(100).toString())
+
+            assertEquals(
+                    "[NIL]",
+                    List<Int>().divide(2).toString())
+        }
+    }
 }
