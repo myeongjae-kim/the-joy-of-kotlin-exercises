@@ -112,4 +112,20 @@ class Ch8ExerciseTest {
             assertEquals(sequence(List(Result(1), Result(2))).toString(), "Success([1, 2, NIL])")
         }
     }
+
+    @Nested
+    inner class Ex08 {
+
+        @Test
+        fun solve() {
+            val list1 = List(1, 2, 3)
+            val list2 = List(4, 5, 6, 7)
+
+            val result = List.zipWith(list1, list2) { a ->
+                { b -> a + b }
+            }
+
+            assertEquals(result.toString(), "[5, 7, 9, NIL]")
+        }
+    }
 }

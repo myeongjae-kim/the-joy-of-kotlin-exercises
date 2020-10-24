@@ -1,7 +1,6 @@
 package util
 
 import java.lang.RuntimeException
-import util.Result
 
 sealed class List<A> {
     abstract fun isEmpty(): Boolean
@@ -155,5 +154,15 @@ sealed class List<A> {
             list.flatMap { if (p(it)) List(it) else invoke() }
 
         fun <A> lastSafe(list: List<A>): Result<A> = list.foldLeft(Result()) { { elem -> Result(elem) } }
+
+        fun <A, B, C> zipWith(list1: List<A>, list2: List<B>, f: (A) -> (B) -> C): List<C> {
+            tailrec fun zipWith(acc: List<C>, list1: List<A>, list2: List<B>): List<C> = when {
+                list1 is Cons && list2 is Cons -> zipWith(acc.cons(f(list1.head)(list2.head)), list1.tail, list2.tail)
+                else -> acc.reverse()
+            }
+
+            return zipWith(invoke(), list1, list2)
+        }
+
     }
 }
