@@ -1,10 +1,15 @@
 package chap8
 
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import util.*
 import util.List
 import kotlin.test.assertEquals
+import java.math.BigInteger
+import java.util.*
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 class Ch8ExerciseTest {
 
@@ -300,6 +305,65 @@ class Ch8ExerciseTest {
             assertEquals(
                     "[NIL]",
                     List<Int>().divide(2).toString())
+        }
+    }
+
+    @Nested
+    inner class Ex23 {
+        private val random = Random()
+
+        @Test
+        @Disabled // result is different with the book...
+        fun solve() {
+            val testLimit = 35000
+
+            val testList: List<Long> = range(0, testLimit).map {
+                random.nextInt(30).toLong()
+            }
+
+            val es2 = Executors.newFixedThreadPool(2)
+            val es4 = Executors.newFixedThreadPool(4)
+            val es8 = Executors.newFixedThreadPool(8)
+
+            testSerial(5, testList, System.currentTimeMillis())
+            println("Duration serial 1 thread: ${testSerial(10, testList, System.currentTimeMillis())}")
+            testParallel(es2, 5, testList, System.currentTimeMillis())
+            println("Duration parallel 2 threads: ${testParallel(es2,10, testList, System.currentTimeMillis())}")
+            testParallel(es4, 5, testList, System.currentTimeMillis())
+            println("Duration parallel 4 threads: ${testParallel(es4,10, testList, System.currentTimeMillis())}")
+            testParallel(es8, 5, testList, System.currentTimeMillis())
+            println("Duration parallel 8 threads: ${testParallel(es8,10, testList, System.currentTimeMillis())}")
+            es2.shutdown()
+            es4.shutdown()
+            es8.shutdown()
+        }
+
+        private val f = { a: BigInteger -> { b: Long -> a.add(BigInteger.valueOf(fib(b))) } }
+        private val g = { a: BigInteger -> { b: BigInteger -> a.add(b) } }
+
+        private fun testSerial(n: Int, list: List<Long>, startTime: Long): Long {
+            repeat((0 until n).count()) {
+                println("Result:  ${list.foldLeft(BigInteger.ZERO, f)}")
+            }
+            return System.currentTimeMillis() - startTime
+        }
+
+        private fun testParallel(es: ExecutorService, n: Int, list: List<Long>, startTime: Long): Long {
+            repeat((0 until n).count()) {
+                list.parFoldLeft(es, BigInteger.ZERO, f, g).forEachOrElse(
+                        { println("Result: $it") },
+                        { println("Exception:  ${it.message}") },
+                        { println("Empty result") })
+            }
+            return System.currentTimeMillis() - startTime
+        }
+
+        private fun fib(x: Long): Long {
+            return when (x) {
+                0L   -> 0
+                1L   -> 1
+                else -> fib(x - 1) + fib(x - 2)
+            }
         }
     }
 }

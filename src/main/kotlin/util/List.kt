@@ -1,6 +1,8 @@
 package util
 
 import java.lang.RuntimeException
+import java.util.concurrent.ExecutionException
+import java.util.concurrent.ExecutorService
 
 sealed class List<A> {
     abstract fun isEmpty(): Boolean
@@ -40,6 +42,7 @@ sealed class List<A> {
     fun drop(n: Int): List<A> = drop(this, n)
     fun dropWhile(p: (A) -> Boolean): List<A> = dropWhile(this, p)
     fun concat(list: List<A>): List<A> = concat(this, list)
+    fun concatViaFoldLeft(list: List<A>): List<A> = Companion.concatViaFoldLeft(this, list)
     fun reverse(): List<A> = reverse(this)
     fun init(): List<A> = init(this)
 
@@ -80,6 +83,12 @@ sealed class List<A> {
     fun splitListAt(index: Int): List<List<A>> = Companion.splitListAt(this, index)
     fun myDivide(depth: Int) = Companion.myDivide(this, depth)
     fun divide(depth: Int) = Companion.divide(this, depth)
+    fun <B> parFoldLeft(
+            es: ExecutorService,
+            identity: B,
+            f: (B) -> (A) -> B,
+            m: (B) -> (B) -> B
+    ): Result<B> = parFoldLeft(this, es, identity, f, m)
 
     override fun equals(other: Any?): Boolean {
         tailrec fun equals(list1: List<A>, list2: List<*>): Boolean = when {
@@ -334,5 +343,28 @@ sealed class List<A> {
                         acc && p(elem)
                     }
                 }
+
+        fun <A, B> parFoldLeft(
+                list: List<A>,
+                es: ExecutorService,
+                identity: B,
+                f: (B) -> (A) -> B,
+                m: (B) -> (B) -> B
+        ): Result<B> = try {
+            val result: List<B> = list.divide(1024).map { subList: List<A> ->
+                es.submit<B> { subList.foldLeft(identity, f) }
+            }.map { fb ->
+                try {
+                    fb.get()
+                } catch (e: InterruptedException) {
+                    throw RuntimeException(e)
+                } catch(e: ExecutionException) {
+                    throw RuntimeException(e)
+                }
+            }
+            Result(result.foldLeft(identity, m))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 }
