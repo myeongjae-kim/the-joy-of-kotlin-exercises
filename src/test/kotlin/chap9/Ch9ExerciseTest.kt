@@ -64,4 +64,46 @@ class Ch9ExerciseTest {
             println(if (condition) message2() else defaultMessage())
         }
     }
+
+    @Nested
+    inner class Ex03 {
+        @Test
+        fun solve() {
+            val constructMessage: (Lazy<String>) -> (Lazy<String>) -> Lazy<String> =
+                    { greetings ->
+                        { name ->
+                            Lazy { "${greetings()}, ${name()}!"}
+                        }
+                    }
+
+            val greetings = Lazy {
+                println("Evaluating greetings")
+                "Hello"
+            }
+
+            val name1: Lazy<String> = Lazy {
+                println("Evaluating name")
+                "Mickey"
+            }
+
+            val name2: Lazy<String> = Lazy {
+                println("Evaluating name")
+                "Donald"
+            }
+
+            val defaultMessage = Lazy {
+                println("Evaluating default message")
+                "No greetings when time is odd"
+            }
+
+            val greetingsString = constructMessage(greetings)
+
+            val message1 = greetingsString(name1)
+            val message2 = greetingsString(name2)
+            val condition = Random(System.currentTimeMillis()).nextInt() and 1 == 0
+            println(if (condition) message1() else defaultMessage())
+            println(if (condition) message1() else defaultMessage())
+            println(if (condition) message2() else defaultMessage())
+        }
+    }
 }
