@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import util.Lazy
 import kotlin.random.Random
+import kotlin.test.assertEquals
 
 class Ch9ExerciseTest {
 
@@ -104,6 +105,30 @@ class Ch9ExerciseTest {
             println(if (condition) message1() else defaultMessage())
             println(if (condition) message1() else defaultMessage())
             println(if (condition) message2() else defaultMessage())
+        }
+    }
+
+    @Nested
+    inner class Ex04 {
+        @Test
+        fun solve() {
+            fun lift2(f: (String) -> (String) -> String): (Lazy<String>) -> (Lazy<String>) -> Lazy<String> =
+                    { s1 ->
+                        { s2 ->
+                            Lazy { f(s1())(s2()) }
+                        }
+                    }
+
+            val consMessage: (String) -> (String) -> String =
+                    { greetings ->
+                        { name ->
+                            "$greetings, $name!"
+                        }
+                    }
+
+            val lazyConsMessage = lift2(consMessage)
+
+            assertEquals("Hello, world!", lazyConsMessage(Lazy {"Hello"})(Lazy {"world"})())
         }
     }
 }
