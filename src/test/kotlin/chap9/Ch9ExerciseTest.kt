@@ -3,6 +3,7 @@ package chap9
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import util.Lazy
+import kotlin.random.Random
 
 class Ch9ExerciseTest {
 
@@ -25,6 +26,42 @@ class Ch9ExerciseTest {
             println(first() || second())
             println(first() || second())
             println(or(first, second))
+        }
+    }
+
+    @Nested
+    inner class Ex02 {
+        @Test
+        fun solve() {
+            fun constructMessage(greetings: Lazy<String>, name:Lazy<String>): Lazy<String> =
+                    Lazy { "${greetings()}, ${name()}!" }
+
+            val greetings = Lazy {
+                println("Evaluating greetings")
+                "Hello"
+            }
+
+            val name1: Lazy<String> = Lazy {
+                println("Evaluating name")
+                "Mickey"
+            }
+
+            val name2: Lazy<String> = Lazy {
+                println("Evaluating name")
+                "Donald"
+            }
+
+            val defaultMessage = Lazy {
+                println("Evaluating default message")
+                "No greetings when time is odd"
+            }
+
+            val message1 = constructMessage(greetings, name1)
+            val message2 = constructMessage(greetings, name2)
+            val condition = Random(System.currentTimeMillis()).nextInt() and 1 == 0
+            println(if (condition) message1() else defaultMessage())
+            println(if (condition) message1() else defaultMessage())
+            println(if (condition) message2() else defaultMessage())
         }
     }
 }
