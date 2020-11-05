@@ -7,6 +7,8 @@ class Lazy <A>(f: () -> A) {
 
     fun <B> map(f: (A) -> B): Lazy<B> = map(this, f)
 
+    fun <B> flatMap(f: (A) -> Lazy<B>): Lazy<B> = flatMap(this, f)
+
     companion object {
         fun <A, B, C> lift2(f: (A) -> (B) -> C): (Lazy<A>) -> (Lazy<B>) -> Lazy<C> =
                 { a ->
@@ -18,6 +20,8 @@ class Lazy <A>(f: () -> A) {
         fun <A, B> map(a: Lazy<A>, f: (A) -> B): Lazy<B> = Lazy {
             f(a())
         }
+
+        fun <A, B> flatMap(a: Lazy<A>, f: (A) -> Lazy<B>): Lazy<B> = a.map(f)()
     }
 }
 

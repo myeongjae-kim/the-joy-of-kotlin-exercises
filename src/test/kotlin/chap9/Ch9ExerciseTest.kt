@@ -156,4 +156,12 @@ class Ch9ExerciseTest {
             assertEquals(Lazy { 1 }.map { it.toString() }(), "1")
         }
     }
+
+    @Nested
+    inner class Ex07 {
+        @Test
+        fun solve() {
+            assertEquals(Lazy { 1 }.flatMap { Lazy{ it.toString() } }(), "1")
+        }
+    }
 }
