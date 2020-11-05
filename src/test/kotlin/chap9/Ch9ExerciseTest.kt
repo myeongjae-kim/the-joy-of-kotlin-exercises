@@ -3,6 +3,7 @@ package chap9
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import util.Lazy
+import util.List
 import kotlin.random.Random
 import kotlin.test.assertEquals
 
@@ -162,6 +163,14 @@ class Ch9ExerciseTest {
         @Test
         fun solve() {
             assertEquals(Lazy { 1 }.flatMap { Lazy{ it.toString() } }(), "1")
+        }
+    }
+
+    @Nested
+    inner class Ex08 {
+        @Test
+        fun solve() {
+            assertEquals(Lazy.sequence(List(Lazy { 1 }, Lazy { 2 }))().toString(), "[1, 2, NIL]")
         }
     }
 }

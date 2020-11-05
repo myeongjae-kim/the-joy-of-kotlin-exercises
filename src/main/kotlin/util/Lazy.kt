@@ -22,6 +22,11 @@ class Lazy <A>(f: () -> A) {
         }
 
         fun <A, B> flatMap(a: Lazy<A>, f: (A) -> Lazy<B>): Lazy<B> = a.map(f)()
+
+        fun <A> sequence(list: List<Lazy<A>>): Lazy<List<A>> = Lazy {
+            list.map { it() }
+        }
+
     }
 }
 
