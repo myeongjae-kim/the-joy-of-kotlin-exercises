@@ -131,4 +131,21 @@ class Ch9ExerciseTest {
             assertEquals("Hello, world!", lazyConsMessage(Lazy {"Hello"})(Lazy {"world"})())
         }
     }
+
+    @Nested
+    inner class Ex05 {
+        @Test
+        fun solve() {
+            val consMessage: (String) -> (String) -> String =
+                    { greetings ->
+                        { name ->
+                            "$greetings, $name!"
+                        }
+                    }
+
+            val lazyConsMessage = Lazy.lift2(consMessage)
+
+            assertEquals("Hello, world!", lazyConsMessage(Lazy {"Hello"})(Lazy {"world"})())
+        }
+    }
 }
