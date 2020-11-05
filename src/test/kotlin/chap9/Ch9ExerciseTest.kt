@@ -148,4 +148,12 @@ class Ch9ExerciseTest {
             assertEquals("Hello, world!", lazyConsMessage(Lazy {"Hello"})(Lazy {"world"})())
         }
     }
+
+    @Nested
+    inner class Ex06 {
+        @Test
+        fun solve() {
+            assertEquals(Lazy { 1 }.map { it.toString() }(), "1")
+        }
+    }
 }

@@ -5,6 +5,8 @@ class Lazy <A>(f: () -> A) {
 
     operator fun invoke(): A = value
 
+    fun <B> map(f: (A) -> B): Lazy<B> = map(this, f)
+
     companion object {
         fun <A, B, C> lift2(f: (A) -> (B) -> C): (Lazy<A>) -> (Lazy<B>) -> Lazy<C> =
                 { a ->
@@ -12,6 +14,10 @@ class Lazy <A>(f: () -> A) {
                         Lazy { f(a())(b()) }
                     }
                 }
+
+        fun <A, B> map(a: Lazy<A>, f: (A) -> B): Lazy<B> = Lazy {
+            f(a())
+        }
     }
 }
 
