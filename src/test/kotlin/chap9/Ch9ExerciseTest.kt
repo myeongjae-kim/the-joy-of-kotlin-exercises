@@ -192,4 +192,20 @@ class Ch9ExerciseTest {
             assertEquals(stream.tail().getOrElse(Stream()).head().toString(), "Success(1)")
         }
     }
+
+    @Nested
+    inner class Ex12 {
+        @Test
+        fun solve() {
+            val stream: Stream<Int> = Stream.from(1)
+
+            var limited = stream.takeAtMost(4)
+
+            var i = 1
+            while (!limited.isEmpty()) {
+                assertEquals(limited.head().getOrElse(-1), i++)
+                limited = limited.tail().getOrElse(Stream())
+            }
+        }
+    }
 }
