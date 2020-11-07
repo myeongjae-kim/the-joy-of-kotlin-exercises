@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test
 import util.Lazy
 import util.List
 import util.Stream
+import java.util.concurrent.ThreadLocalRandom
 import kotlin.random.Random
 import kotlin.test.assertEquals
 
@@ -222,6 +223,22 @@ class Ch9ExerciseTest {
             val dropped2 = Stream.cons(Lazy { 1 }, Lazy { Stream() }).dropAtMost(4)
 
             assertEquals(dropped2.head().toString(), "Empty")
+        }
+    }
+
+    @Nested
+    inner class Ex14 {
+
+        fun random(): Int {
+            val rnd = ThreadLocalRandom.current().nextInt()
+            println("evaluating $rnd")
+            return rnd
+        }
+
+        @Test
+        fun solve() {
+            val stream = Stream.repeat(::random).dropAtMost(60000).takeAtMost(60000)
+            stream.head().forEach(::println)
         }
     }
 }
