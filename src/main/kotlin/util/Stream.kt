@@ -6,6 +6,7 @@ sealed class Stream<out A>{
     abstract fun tail(): Result<Stream<A>>
 
     abstract fun takeAtMost(n: Int): Stream<A>
+    abstract fun dropAtMost(n: Int): Stream<A>
 
     private object Empty: Stream<Nothing>() {
         override fun head(): Result<Nothing> = Result()
@@ -13,6 +14,7 @@ sealed class Stream<out A>{
         override fun isEmpty(): Boolean = true
 
         override fun takeAtMost(n: Int): Stream<Nothing> = this
+        override fun dropAtMost(n: Int): Stream<Nothing> = this
     }
 
     private class Cons<out A>(
@@ -27,6 +29,12 @@ sealed class Stream<out A>{
             Empty
         } else {
             Cons(hd, Lazy { tl().takeAtMost(n - 1)} )
+        }
+
+        override fun dropAtMost(n: Int): Stream<A> = if (n <= 0) {
+            this
+        } else {
+            tl().dropAtMost(n - 1)
         }
     }
 

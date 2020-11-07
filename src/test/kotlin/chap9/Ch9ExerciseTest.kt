@@ -208,4 +208,20 @@ class Ch9ExerciseTest {
             }
         }
     }
+
+    @Nested
+    inner class Ex13 {
+        @Test
+        fun solve() {
+            val stream = Stream.from(1)
+
+            val dropped = stream.dropAtMost(4)
+
+            assertEquals(dropped.head().toString(), "Success(5)")
+
+            val dropped2 = Stream.cons(Lazy { 1 }, Lazy { Stream() }).dropAtMost(4)
+
+            assertEquals(dropped2.head().toString(), "Empty")
+        }
+    }
 }
