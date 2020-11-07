@@ -7,6 +7,7 @@ sealed class Stream<out A>{
 
     abstract fun takeAtMost(n: Int): Stream<A>
     abstract fun dropAtMost(n: Int): Stream<A>
+    abstract fun toList(): List<out A>
 
     private object Empty: Stream<Nothing>() {
         override fun head(): Result<Nothing> = Result()
@@ -15,6 +16,7 @@ sealed class Stream<out A>{
 
         override fun takeAtMost(n: Int): Stream<Nothing> = this
         override fun dropAtMost(n: Int): Stream<Nothing> = this
+        override fun toList(): List<out Nothing> = List()
     }
 
     private class Cons<out A>(
@@ -32,6 +34,8 @@ sealed class Stream<out A>{
         }
 
         override fun dropAtMost(n: Int): Stream<A> = dropAtMost(n, this)
+
+        override fun toList(): List<out A> = toList(this)
     }
 
     companion object {
@@ -52,6 +56,17 @@ sealed class Stream<out A>{
                 else -> stream
             }
             else -> stream
+        }
+
+        fun <A> toList(stream: Stream<A>): List<A> {
+            tailrec fun <A> toList(stream: Stream<A>, list: List<A>): List<A> {
+                return when (stream) {
+                    is Cons -> toList(stream.tl(), list.cons(stream.hd()))
+                    Empty -> list
+                }
+            }
+
+            return toList(stream, List()).reverse()
         }
     }
 }

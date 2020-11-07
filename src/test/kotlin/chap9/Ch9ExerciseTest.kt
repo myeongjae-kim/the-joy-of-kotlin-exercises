@@ -241,4 +241,16 @@ class Ch9ExerciseTest {
             stream.head().forEach(::println)
         }
     }
+
+    @Nested
+    inner class Ex15 {
+
+        @Test
+        fun solve() {
+            val expected = ("[${(60000..119999).joinToString(", ")}, NIL]")
+
+            val stream = Stream.from(0).dropAtMost(60000).takeAtMost(60000)
+            assertEquals(expected,  stream.toList().toString())
+        }
+    }
 }
