@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import util.Lazy
 import util.List
+import util.Stream
 import kotlin.random.Random
 import kotlin.test.assertEquals
 
@@ -179,6 +180,16 @@ class Ch9ExerciseTest {
         @Test
         fun solve() {
             assertEquals(Lazy.sequenceResult(List(Lazy { 1 }, Lazy { 2 }))().getOrElse(List()).toString(), "[1, 2, NIL]")
+        }
+    }
+
+    @Nested
+    inner class Ex11 {
+        @Test
+        fun solve() {
+            val stream: Stream<Int> = Stream.repeat { 1 }
+            assertEquals(stream.head().toString(), "Success(1)")
+            assertEquals(stream.tail().getOrElse(Stream()).head().toString(), "Success(1)")
         }
     }
 }
