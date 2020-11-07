@@ -115,6 +115,24 @@ sealed class Result<out A> : Serializable {
         fun <A> failure(message: String): Result<A> = Failure(IllegalStateException(message))
         fun <A> failure(exception: RuntimeException): Result<A> = Failure(exception)
         fun <A> failure(exception: Exception): Result<A> = Failure(IllegalStateException(exception))
+
+        fun <A> sequence(list: List<Result<A>>): Result<List<A>> = traverse(list) { it }
+
+        fun <A, B> traverse(list: List<A>, f: (A) -> Result<B>): Result<List<B>> =
+                list.coFoldRight(Result(List())) { elem: A ->
+                    { acc: Result<List<B>> ->
+                        acc.flatMap { list -> f(elem).map { list.cons(it) } }
+                    }
+                }
+
+        fun <A> of(f: () -> A): Result<A> =
+            try {
+                Result(f())
+            } catch (e: RuntimeException) {
+                failure(e)
+            } catch (e: Exception) {
+                failure(e)
+            }
     }
 
     fun getOrElse(defaultValue: @UnsafeVariance A): A = when (this) {

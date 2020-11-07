@@ -173,4 +173,12 @@ class Ch9ExerciseTest {
             assertEquals(Lazy.sequence(List(Lazy { 1 }, Lazy { 2 }))().toString(), "[1, 2, NIL]")
         }
     }
+
+    @Nested
+    inner class Ex09 {
+        @Test
+        fun solve() {
+            assertEquals(Lazy.sequenceResult(List(Lazy { 1 }, Lazy { 2 }))().getOrElse(List()).toString(), "[1, 2, NIL]")
+        }
+    }
 }

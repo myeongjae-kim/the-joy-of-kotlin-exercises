@@ -1,9 +1,9 @@
 package util
 
-class Lazy <A>(f: () -> A) {
+class Lazy <out A>(f: () -> A): () -> A {
     private val value: A by lazy(f)
 
-    operator fun invoke(): A = value
+    override operator fun invoke(): A = value
 
     fun <B> map(f: (A) -> B): Lazy<B> = map(this, f)
 
@@ -25,6 +25,10 @@ class Lazy <A>(f: () -> A) {
 
         fun <A> sequence(list: List<Lazy<A>>): Lazy<List<A>> = Lazy {
             list.map { it() }
+        }
+
+        fun <A> sequenceResult(list: List<Lazy<A>>): Lazy<Result<List<A>>> = Lazy {
+            Result.sequence(list.map { Result.of(it) })
         }
 
     }
