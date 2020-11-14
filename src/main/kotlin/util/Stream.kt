@@ -28,13 +28,12 @@ sealed class Stream<out A>{
         }
     }
 
-    fun filter(p: (A) -> Boolean): Stream<A> = this.foldRight(Lazy { invoke() }) { elem ->
-        { acc ->
-            if (p(elem)) {
-                cons(Lazy { elem }, acc)
-            } else {
-                acc()
-            }
+    fun filter(p: (A) -> Boolean): Stream<A> = dropWhile { !p(it) }.let { stream ->
+        when(stream) {
+            is Empty -> stream
+            is Cons -> stream.head().map { a ->
+                cons(Lazy { a }, Lazy { stream.tl().filter(p) })
+            }.getOrElse(Empty)
         }
     }
 

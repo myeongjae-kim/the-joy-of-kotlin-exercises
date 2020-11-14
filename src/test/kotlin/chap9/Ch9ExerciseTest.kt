@@ -470,7 +470,7 @@ class Ch9ExerciseTest {
                     Stream.from(1).takeAtMost(3).toList().toString())
 
             fun fibs(): Stream<Int> = Stream.unfold(Pair(0, 1)) {
-                Result(Pair(it.first, Pair(it.second, it.first + it.second)))
+                Result(Pair(it.second, Pair(it.second, it.first + it.second)))
             }
 
             assertEquals("[1, 1, 2, 3, 5, 8, 13, 21, 34, 55, NIL]",
