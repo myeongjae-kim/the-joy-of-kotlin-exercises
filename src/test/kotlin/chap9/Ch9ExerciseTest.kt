@@ -287,4 +287,19 @@ class Ch9ExerciseTest {
             assertEquals("[0, 1, 2, 3, NIL]", Stream.from(0).takeWhile { it < 4 }.toList().toString())
         }
     }
+
+    @Nested
+    inner class Ex18 {
+
+        @Test
+        fun solve() {
+            assertEquals(
+                    "[10, 11, NIL]",
+                    Stream.from(0)
+                            .dropWhile { it < 10 }
+                            .takeAtMost(2)
+                            .toList().toString())
+        }
+    }
+
 }
