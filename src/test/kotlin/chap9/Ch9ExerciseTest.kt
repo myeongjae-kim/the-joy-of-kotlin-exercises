@@ -395,4 +395,18 @@ class Ch9ExerciseTest {
             assertEquals(3, evaluatedValue)
         }
     }
+
+    @Nested
+    inner class Ex25 {
+
+        @Test
+        fun solve() {
+            val s1 = Stream.from(1).takeAtMost(3)
+            val s2 = Stream.from(4).takeAtMost(3)
+
+            assertEquals(
+                    "[1, 2, 3, 4, 5, 6, NIL]",
+                    s1.append(Lazy { s2 }).toList().toString())
+        }
+    }
 }

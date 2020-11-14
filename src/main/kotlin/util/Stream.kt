@@ -47,6 +47,13 @@ sealed class Stream<out A>{
         { Result(elem) }
     }
 
+    fun append(s: Lazy<Stream<@UnsafeVariance A>>): Stream<A> =
+            this.foldRight(s) { elem ->
+                { acc ->
+                    cons(Lazy {elem}, acc)
+                }
+            }
+
     private object Empty: Stream<Nothing>() {
         override fun head(): Result<Nothing> = Result()
         override fun tail(): Result<Nothing> = Result()
