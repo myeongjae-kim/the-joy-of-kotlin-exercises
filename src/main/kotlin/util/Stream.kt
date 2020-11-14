@@ -16,6 +16,12 @@ sealed class Stream<out A>{
 
     abstract fun <B> foldRight(identity: Lazy<B>, f: (A) -> (Lazy<B>) -> B): B
 
+    fun <B> map(f: (A) -> B): Stream<B> = this.foldRight(Lazy { invoke() }) { elem ->
+        { acc ->
+            cons(Lazy { f(elem) }, acc)
+        }
+    }
+
     fun takeWhileViaFoldRight(p: (A) -> Boolean): Stream<A> {
         return this.foldRight(Lazy { Empty }) { elem: A ->
             { acc: Lazy<Stream<A>> ->

@@ -355,4 +355,24 @@ class Ch9ExerciseTest {
                     Stream<Int>().headSafeViaFoldRight().toString())
         }
     }
+
+    @Nested
+    inner class Ex23 {
+
+        @Test
+        fun solve() {
+            var evaluated = false
+
+            val s: Stream<String> = Stream.from(1).takeAtMost(3).map {
+                evaluated = true
+                it.toString()
+            }
+
+            assert(!evaluated)
+
+            assertEquals("[1, 2, 3, NIL]", s.toList().toString())
+
+            assert(evaluated)
+        }
+    }
 }
