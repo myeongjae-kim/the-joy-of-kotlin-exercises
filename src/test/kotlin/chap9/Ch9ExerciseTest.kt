@@ -409,4 +409,18 @@ class Ch9ExerciseTest {
                     s1.append(Lazy { s2 }).toList().toString())
         }
     }
+
+
+    @Nested
+    inner class Ex26 {
+
+        @Test
+        fun solve() {
+            val f: (Int) -> Stream<Int> = { Stream.cons(Lazy {it}, Lazy { Stream() }) }
+
+            assertEquals(
+                    "[1, 2, 3, NIL]",
+                    Stream.from(1).takeAtMost(3).flatMap(f).toList().toString())
+        }
+    }
 }

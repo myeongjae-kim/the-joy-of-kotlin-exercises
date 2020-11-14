@@ -22,6 +22,12 @@ sealed class Stream<out A>{
         }
     }
 
+    fun <B> flatMap(f: (A) -> Stream<B>): Stream<B> = this.foldRight(Lazy { invoke() }) { elem ->
+        { acc ->
+            f(elem).append(acc)
+        }
+    }
+
     fun filter(p: (A) -> Boolean): Stream<A> = this.foldRight(Lazy { invoke() }) { elem ->
         { acc ->
             if (p(elem)) {
