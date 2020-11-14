@@ -12,6 +12,8 @@ sealed class Stream<out A>{
     abstract fun takeWhile(p: (A) -> Boolean): Stream<A>
     abstract fun dropWhile(p: (A) -> Boolean): Stream<A>
 
+    fun exists(p: (A) -> Boolean): Boolean = exists(this, p)
+
     private object Empty: Stream<Nothing>() {
         override fun head(): Result<Nothing> = Result()
         override fun tail(): Result<Nothing> = Result()
@@ -88,6 +90,11 @@ sealed class Stream<out A>{
         tailrec fun <A> dropWhile(s: Stream<A>, p: (A) -> Boolean): Stream<A> = when {
             s is Cons && p(s.hd()) -> dropWhile(s.tl(), p)
             else -> s
+        }
+
+        tailrec fun <A> exists(s: Stream<A>, p: (A) -> Boolean): Boolean = when (s) {
+            is Cons -> if (p(s.hd())) true else exists(s.tl(), p)
+            else -> false
         }
     }
 }

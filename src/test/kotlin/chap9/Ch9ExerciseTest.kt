@@ -302,4 +302,16 @@ class Ch9ExerciseTest {
         }
     }
 
+    @Nested
+    inner class Ex19 {
+
+        @Test
+        fun solve() {
+            assert(
+                    Stream.iterate(0) {
+                        println("evaluated: ${it + 1}")
+                        it + 1
+                    }.exists { it == 10 })
+        }
+    }
 }
