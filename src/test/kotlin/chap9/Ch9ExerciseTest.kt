@@ -410,7 +410,6 @@ class Ch9ExerciseTest {
         }
     }
 
-
     @Nested
     inner class Ex26 {
 
@@ -421,6 +420,27 @@ class Ch9ExerciseTest {
             assertEquals(
                     "[1, 2, 3, NIL]",
                     Stream.from(1).takeAtMost(3).flatMap(f).toList().toString())
+        }
+    }
+
+    @Nested
+    inner class Ex27 {
+
+        @Test
+        fun solve() {
+            val s = Stream.from(1)
+            var evaluated = 0
+
+            assertEquals(
+                    "Success(3)",
+                    s.find {
+                        evaluated = it
+                        it == 3
+                    }.toString())
+
+            assertEquals(evaluated, 3)
+
+            assertEquals("Empty", Stream.from(1).takeAtMost(3).find { it == 4 }.toString())
         }
     }
 }
