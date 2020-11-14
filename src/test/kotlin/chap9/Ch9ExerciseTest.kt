@@ -340,4 +340,19 @@ class Ch9ExerciseTest {
                     Stream.from(1).takeWhileViaFoldRight { it < 5 }.toList().toString())
         }
     }
+
+    @Nested
+    inner class Ex22 {
+
+        @Test
+        fun solve() {
+            assertEquals(
+                    "Success(0)",
+                    Stream.from(0).headSafeViaFoldRight().toString())
+
+            assertEquals(
+                    "Empty",
+                    Stream<Int>().headSafeViaFoldRight().toString())
+        }
+    }
 }

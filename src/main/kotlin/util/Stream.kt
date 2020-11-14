@@ -27,6 +27,10 @@ sealed class Stream<out A>{
         }
     }
 
+    fun headSafeViaFoldRight(): Result<A> = foldRight(Lazy { Result() }) { elem ->
+        { Result(elem) }
+    }
+
     private object Empty: Stream<Nothing>() {
         override fun head(): Result<Nothing> = Result()
         override fun tail(): Result<Nothing> = Result()
