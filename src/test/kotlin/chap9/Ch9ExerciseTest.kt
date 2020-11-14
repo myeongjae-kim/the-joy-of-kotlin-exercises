@@ -278,4 +278,13 @@ class Ch9ExerciseTest {
                     list.toString())
         }
     }
+
+    @Nested
+    inner class Ex17 {
+
+        @Test
+        fun solve() {
+            assertEquals("[0, 1, 2, 3, NIL]", Stream.from(0).takeWhile { it < 4 }.toList().toString())
+        }
+    }
 }
