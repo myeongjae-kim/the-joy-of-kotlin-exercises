@@ -443,4 +443,19 @@ class Ch9ExerciseTest {
             assertEquals("Empty", Stream.from(1).takeAtMost(3).find { it == 4 }.toString())
         }
     }
+
+    @Nested
+    inner class Ex28 {
+
+        @Test
+        fun solve() {
+            fun fibs(): Stream<Int> = Stream.iterate(Pair(0, 1)) {
+                Pair(it.second, it.first + it.second)
+            }.map { it.second }
+
+            val s = fibs()
+
+            assertEquals("[1, 1, 2, 3, 5, 8, 13, 21, 34, 55, NIL]", s.takeAtMost(10).toList().toString())
+        }
+    }
 }
