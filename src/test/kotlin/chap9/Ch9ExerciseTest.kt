@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test
 import util.Lazy
 import util.List
 import util.Stream
+import util.Result
 import java.util.concurrent.ThreadLocalRandom
 import kotlin.random.Random
 import kotlin.test.assertEquals
@@ -456,6 +457,24 @@ class Ch9ExerciseTest {
             val s = fibs()
 
             assertEquals("[1, 1, 2, 3, 5, 8, 13, 21, 34, 55, NIL]", s.takeAtMost(10).toList().toString())
+        }
+    }
+
+    @Nested
+    inner class Ex29 {
+
+        @Test
+        fun solve() {
+            assertEquals(
+                    "[1, 2, 3, NIL]",
+                    Stream.from(1).takeAtMost(3).toList().toString())
+
+            fun fibs(): Stream<Int> = Stream.unfold(Pair(0, 1)) {
+                Result(Pair(it.first, Pair(it.second, it.first + it.second)))
+            }
+
+            assertEquals("[1, 1, 2, 3, 5, 8, 13, 21, 34, 55, NIL]",
+                    fibs().takeAtMost(10).toList().toString())
         }
     }
 }

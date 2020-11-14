@@ -115,7 +115,7 @@ sealed class Stream<out A>{
 
         operator fun <A> invoke(): Stream<A> = Empty
 
-        fun from(i: Int): Stream<Int> = iterate(i) { it + 1 }
+        fun from(i: Int): Stream<Int> = unfold(i) { Result(Pair(it, it + 1)) }
 
         fun <A> iterate(seed: A, f: (A) -> A): Stream<A> = cons(Lazy { seed }, Lazy { iterate(f(seed), f) })
 
@@ -149,5 +149,10 @@ sealed class Stream<out A>{
             is Cons -> if (p(s.hd())) true else exists(s.tl(), p)
             else -> false
         }
+
+        fun <A, S> unfold(z: S, f: (S) -> Result<Pair<A, S>>): Stream<A> =
+                f(z)
+                        .map { (a, s) -> cons(Lazy { a }, Lazy{ unfold(s, f) }) }
+                        .getOrElse(Empty)
     }
 }
