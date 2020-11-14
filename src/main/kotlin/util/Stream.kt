@@ -14,6 +14,8 @@ sealed class Stream<out A>{
 
     fun exists(p: (A) -> Boolean): Boolean = exists(this, p)
 
+    abstract fun <B> foldRight(identity: Lazy<B>, f: (A) -> (Lazy<B>) -> B): B
+
     private object Empty: Stream<Nothing>() {
         override fun head(): Result<Nothing> = Result()
         override fun tail(): Result<Nothing> = Result()
@@ -25,6 +27,8 @@ sealed class Stream<out A>{
 
         override fun takeWhile(p: (Nothing) -> Boolean): Stream<Nothing> = this
         override fun dropWhile(p: (Nothing) -> Boolean): Stream<Nothing> = this
+
+        override fun <B> foldRight(identity: Lazy<B>, f: (Nothing) -> (Lazy<B>) -> B): B  = identity()
     }
 
     private class Cons<out A>(
@@ -52,6 +56,9 @@ sealed class Stream<out A>{
                     Empty
 
         override fun dropWhile(p: (A) -> Boolean): Stream<A> = dropWhile(this, p)
+
+        override fun <B> foldRight(identity: Lazy<B>, f: (A) -> (Lazy<B>) -> B): B =
+                f(this.hd())(Lazy { this.tl().foldRight(identity, f) })
     }
 
     companion object {

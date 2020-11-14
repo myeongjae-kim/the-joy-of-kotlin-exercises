@@ -314,4 +314,19 @@ class Ch9ExerciseTest {
                     }.exists { it == 10 })
         }
     }
+
+    @Nested
+    inner class Ex20 {
+
+        @Test
+        fun solve() {
+            val sum = Stream.from(1).takeAtMost(10).foldRight(Lazy {0}) { elem ->
+                { acc ->
+                    acc() + elem
+                }
+            }
+
+            assertEquals(sum, 55)
+        }
+    }
 }
