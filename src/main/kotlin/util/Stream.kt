@@ -16,6 +16,17 @@ sealed class Stream<out A>{
 
     abstract fun <B> foldRight(identity: Lazy<B>, f: (A) -> (Lazy<B>) -> B): B
 
+    fun takeWhileViaFoldRight(p: (A) -> Boolean): Stream<A> {
+        return this.foldRight(Lazy { Empty }) { elem: A ->
+            { acc: Lazy<Stream<A>> ->
+                if (p(elem))
+                    cons(Lazy {elem}, acc)
+                else
+                    Empty
+            }
+        }
+    }
+
     private object Empty: Stream<Nothing>() {
         override fun head(): Result<Nothing> = Result()
         override fun tail(): Result<Nothing> = Result()

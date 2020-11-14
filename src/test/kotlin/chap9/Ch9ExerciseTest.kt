@@ -329,4 +329,15 @@ class Ch9ExerciseTest {
             assertEquals(sum, 55)
         }
     }
+
+
+    @Nested
+    inner class Ex21 {
+
+        @Test
+        fun solve() {
+            assertEquals("[1, 2, 3, 4, NIL]",
+                    Stream.from(1).takeWhileViaFoldRight { it < 5 }.toList().toString())
+        }
+    }
 }
