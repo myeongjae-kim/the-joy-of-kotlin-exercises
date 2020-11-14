@@ -253,4 +253,29 @@ class Ch9ExerciseTest {
             assertEquals(expected,  stream.toList().toString())
         }
     }
+
+    @Nested
+    inner class Ex16 {
+
+        @Test
+        fun solve() {
+            assertEquals("[1, 2, 3, NIL]", Stream.from(1).takeAtMost(3).toList().toString())
+            assertEquals("[1, 3, 5, NIL]", Stream.iterate(1) {it + 2}.takeAtMost(3).toList().toString())
+
+            fun inc(i: Int): Int = (i + 1).let {
+                println("generating $it")
+                it
+            }
+
+            val list = Stream
+                    .iterate(0, ::inc)
+                    .takeAtMost(60000)
+                    .dropAtMost(10000)
+                    .takeAtMost(10)
+                    .toList()
+
+            assertEquals("[10000, 10001, 10002, 10003, 10004, 10005, 10006, 10007, 10008, 10009, NIL]",
+                    list.toString())
+        }
+    }
 }
