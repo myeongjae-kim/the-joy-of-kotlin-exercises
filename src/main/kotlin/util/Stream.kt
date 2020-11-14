@@ -22,6 +22,16 @@ sealed class Stream<out A>{
         }
     }
 
+    fun filter(p: (A) -> Boolean): Stream<A> = this.foldRight(Lazy { invoke() }) { elem ->
+        { acc ->
+            if (p(elem)) {
+                cons(Lazy { elem }, acc)
+            } else {
+                acc()
+            }
+        }
+    }
+
     fun takeWhileViaFoldRight(p: (A) -> Boolean): Stream<A> {
         return this.foldRight(Lazy { Empty }) { elem: A ->
             { acc: Lazy<Stream<A>> ->

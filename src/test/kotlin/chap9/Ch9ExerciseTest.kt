@@ -375,4 +375,24 @@ class Ch9ExerciseTest {
             assert(evaluated)
         }
     }
+
+    @Nested
+    inner class Ex24 {
+
+        @Test
+        fun solve() {
+            var evaluatedValue = 0
+
+            val s: Stream<Int> = Stream.from(0).takeAtMost(4).filter {
+                evaluatedValue = it
+                it and 1 == 1
+            }
+
+            assertEquals(1, evaluatedValue)
+
+            assertEquals("[1, 3, NIL]", s.toList().toString())
+
+            assertEquals(3, evaluatedValue)
+        }
+    }
 }
