@@ -9,9 +9,9 @@ sealed class Result<out A> : Serializable {
     abstract fun mapFailure(message: String): Result<A>
     abstract fun forEach(effect: (A) -> Unit)
     abstract fun forEachOrElse(
-            onSuccess: (A) -> Unit = {},
-            onFailure: (RuntimeException) -> Unit = {},
-            onEmpty: () -> Unit = {}
+        onSuccess: (A) -> Unit = {},
+        onFailure: (RuntimeException) -> Unit = {},
+        onEmpty: () -> Unit = {}
     )
 
     internal object Empty : Result<Nothing>() {
@@ -26,9 +26,9 @@ sealed class Result<out A> : Serializable {
         override fun forEach(effect: (Nothing) -> Unit) { }
 
         override fun forEachOrElse(
-                onSuccess: (Nothing) -> Unit,
-                onFailure: (RuntimeException) -> Unit,
-                onEmpty: () -> Unit
+            onSuccess: (Nothing) -> Unit,
+            onFailure: (RuntimeException) -> Unit,
+            onEmpty: () -> Unit
         ) {
             onEmpty()
         }
@@ -46,9 +46,9 @@ sealed class Result<out A> : Serializable {
         override fun forEach(effect: (A) -> Unit) { }
 
         override fun forEachOrElse(
-                onSuccess: (A) -> Unit,
-                onFailure: (RuntimeException) -> Unit,
-                onEmpty: () -> Unit
+            onSuccess: (A) -> Unit,
+            onFailure: (RuntimeException) -> Unit,
+            onEmpty: () -> Unit
         ) {
             onFailure(this.exception)
         }
@@ -78,9 +78,9 @@ sealed class Result<out A> : Serializable {
         override fun forEach(effect: (A) -> Unit) { effect(this.value) }
 
         override fun forEachOrElse(
-                onSuccess: (A) -> Unit,
-                onFailure: (RuntimeException) -> Unit,
-                onEmpty: () -> Unit
+            onSuccess: (A) -> Unit,
+            onFailure: (RuntimeException) -> Unit,
+            onEmpty: () -> Unit
         ) {
             onSuccess(this.value)
         }
@@ -119,11 +119,11 @@ sealed class Result<out A> : Serializable {
         fun <A> sequence(list: List<Result<A>>): Result<List<A>> = traverse(list) { it }
 
         fun <A, B> traverse(list: List<A>, f: (A) -> Result<B>): Result<List<B>> =
-                list.coFoldRight(Result(List())) { elem: A ->
-                    { acc: Result<List<B>> ->
-                        acc.flatMap { list -> f(elem).map { list.cons(it) } }
-                    }
+            list.coFoldRight(Result(List())) { elem: A ->
+                { acc: Result<List<B>> ->
+                    acc.flatMap { list -> f(elem).map { list.cons(it) } }
                 }
+            }
 
         fun <A> of(f: () -> A): Result<A> =
             try {

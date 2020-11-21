@@ -3,13 +3,16 @@ package chap8
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import util.*
 import util.List
-import kotlin.test.assertEquals
+import util.Option
+import util.Result
+import util.range
+import util.unfold
 import java.math.BigInteger
-import java.util.*
+import java.util.Random
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import kotlin.test.assertEquals
 
 class Ch8ExerciseTest {
 
@@ -80,11 +83,11 @@ class Ch8ExerciseTest {
     @Nested
     inner class Ex06 {
         fun <A> sequence(list: List<Result<A>>): Result<List<A>> =
-                list.coFoldRight(Result(List())) { elem ->
-                    { acc ->
-                        acc.flatMap { list -> elem.map { list.cons(it) } }
-                    }
+            list.coFoldRight(Result(List())) { elem ->
+                { acc ->
+                    acc.flatMap { list -> elem.map { list.cons(it) } }
                 }
+            }
 
         @Test
         fun solve() {
@@ -277,34 +280,41 @@ class Ch8ExerciseTest {
         @Test
         fun solve() {
             assertEquals(
-                    "[[1, 2, NIL], [3, 4, NIL], NIL]",
-                    List(1, 2, 3, 4).splitListAt(2).toString())
+                "[[1, 2, NIL], [3, 4, NIL], NIL]",
+                List(1, 2, 3, 4).splitListAt(2).toString()
+            )
 
             // my implementation
             assertEquals(
-                    "[[1, 2, NIL], [3, 4, NIL], [5, 6, NIL], [7, 8, NIL], NIL]",
-                    List(1, 2, 3, 4, 5, 6, 7, 8).myDivide(2).toString())
+                "[[1, 2, NIL], [3, 4, NIL], [5, 6, NIL], [7, 8, NIL], NIL]",
+                List(1, 2, 3, 4, 5, 6, 7, 8).myDivide(2).toString()
+            )
 
             assertEquals(
-                    "[[1, NIL], [2, NIL], [3, NIL], [4, NIL], NIL]",
-                    List(1, 2, 3, 4).myDivide(100).toString())
+                "[[1, NIL], [2, NIL], [3, NIL], [4, NIL], NIL]",
+                List(1, 2, 3, 4).myDivide(100).toString()
+            )
 
             assertEquals(
-                    "[NIL]",
-                    List<Int>().myDivide(2).toString())
+                "[NIL]",
+                List<Int>().myDivide(2).toString()
+            )
 
             // book's implementation
             assertEquals(
-                    "[[1, 2, NIL], [3, 4, NIL], [5, 6, NIL], [7, 8, NIL], NIL]",
-                    List(1, 2, 3, 4, 5, 6, 7, 8).divide(2).toString())
+                "[[1, 2, NIL], [3, 4, NIL], [5, 6, NIL], [7, 8, NIL], NIL]",
+                List(1, 2, 3, 4, 5, 6, 7, 8).divide(2).toString()
+            )
 
             assertEquals(
-                    "[[1, NIL], [2, NIL], [3, NIL], [4, NIL], NIL]",
-                    List(1, 2, 3, 4).divide(100).toString())
+                "[[1, NIL], [2, NIL], [3, NIL], [4, NIL], NIL]",
+                List(1, 2, 3, 4).divide(100).toString()
+            )
 
             assertEquals(
-                    "[NIL]",
-                    List<Int>().divide(2).toString())
+                "[NIL]",
+                List<Int>().divide(2).toString()
+            )
         }
     }
 
@@ -351,17 +361,18 @@ class Ch8ExerciseTest {
         private fun testParallel(es: ExecutorService, n: Int, list: List<Long>, startTime: Long): Long {
             repeat((0 until n).count()) {
                 list.parFoldLeft(es, BigInteger.ZERO, f, g).forEachOrElse(
-                        { println("Result: $it") },
-                        { println("Exception:  ${it.message}") },
-                        { println("Empty result") })
+                    { println("Result: $it") },
+                    { println("Exception:  ${it.message}") },
+                    { println("Empty result") }
+                )
             }
             return System.currentTimeMillis() - startTime
         }
 
         private fun fib(x: Long): Long {
             return when (x) {
-                0L   -> 0
-                1L   -> 1
+                0L -> 0
+                1L -> 1
                 else -> fib(x - 1) + fib(x - 2)
             }
         }

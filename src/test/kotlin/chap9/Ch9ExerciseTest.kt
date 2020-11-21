@@ -4,8 +4,8 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import util.Lazy
 import util.List
-import util.Stream
 import util.Result
+import util.Stream
 import java.util.concurrent.ThreadLocalRandom
 import kotlin.random.Random
 import kotlin.test.assertEquals
@@ -38,8 +38,8 @@ class Ch9ExerciseTest {
     inner class Ex02 {
         @Test
         fun solve() {
-            fun constructMessage(greetings: Lazy<String>, name:Lazy<String>): Lazy<String> =
-                    Lazy { "${greetings()}, ${name()}!" }
+            fun constructMessage(greetings: Lazy<String>, name: Lazy<String>): Lazy<String> =
+                Lazy { "${greetings()}, ${name()}!" }
 
             val greetings = Lazy {
                 println("Evaluating greetings")
@@ -75,11 +75,11 @@ class Ch9ExerciseTest {
         @Test
         fun solve() {
             val constructMessage: (Lazy<String>) -> (Lazy<String>) -> Lazy<String> =
-                    { greetings ->
-                        { name ->
-                            Lazy { "${greetings()}, ${name()}!"}
-                        }
+                { greetings ->
+                    { name ->
+                        Lazy { "${greetings()}, ${name()}!" }
                     }
+                }
 
             val greetings = Lazy {
                 println("Evaluating greetings")
@@ -117,22 +117,22 @@ class Ch9ExerciseTest {
         @Test
         fun solve() {
             fun lift2(f: (String) -> (String) -> String): (Lazy<String>) -> (Lazy<String>) -> Lazy<String> =
-                    { s1 ->
-                        { s2 ->
-                            Lazy { f(s1())(s2()) }
-                        }
+                { s1 ->
+                    { s2 ->
+                        Lazy { f(s1())(s2()) }
                     }
+                }
 
             val consMessage: (String) -> (String) -> String =
-                    { greetings ->
-                        { name ->
-                            "$greetings, $name!"
-                        }
+                { greetings ->
+                    { name ->
+                        "$greetings, $name!"
                     }
+                }
 
             val lazyConsMessage = lift2(consMessage)
 
-            assertEquals("Hello, world!", lazyConsMessage(Lazy {"Hello"})(Lazy {"world"})())
+            assertEquals("Hello, world!", lazyConsMessage(Lazy { "Hello" })(Lazy { "world" })())
         }
     }
 
@@ -141,15 +141,15 @@ class Ch9ExerciseTest {
         @Test
         fun solve() {
             val consMessage: (String) -> (String) -> String =
-                    { greetings ->
-                        { name ->
-                            "$greetings, $name!"
-                        }
+                { greetings ->
+                    { name ->
+                        "$greetings, $name!"
                     }
+                }
 
             val lazyConsMessage = Lazy.lift2(consMessage)
 
-            assertEquals("Hello, world!", lazyConsMessage(Lazy {"Hello"})(Lazy {"world"})())
+            assertEquals("Hello, world!", lazyConsMessage(Lazy { "Hello" })(Lazy { "world" })())
         }
     }
 
@@ -165,7 +165,7 @@ class Ch9ExerciseTest {
     inner class Ex07 {
         @Test
         fun solve() {
-            assertEquals(Lazy { 1 }.flatMap { Lazy{ it.toString() } }(), "1")
+            assertEquals(Lazy { 1 }.flatMap { Lazy { it.toString() } }(), "1")
         }
     }
 
@@ -251,7 +251,7 @@ class Ch9ExerciseTest {
             val expected = ("[${(60000..119999).joinToString(", ")}, NIL]")
 
             val stream = Stream.from(0).dropAtMost(60000).takeAtMost(60000)
-            assertEquals(expected,  stream.toList().toString())
+            assertEquals(expected, stream.toList().toString())
         }
     }
 
@@ -261,7 +261,7 @@ class Ch9ExerciseTest {
         @Test
         fun solve() {
             assertEquals("[1, 2, 3, NIL]", Stream.from(1).takeAtMost(3).toList().toString())
-            assertEquals("[1, 3, 5, NIL]", Stream.iterate(1) {it + 2}.takeAtMost(3).toList().toString())
+            assertEquals("[1, 3, 5, NIL]", Stream.iterate(1) { it + 2 }.takeAtMost(3).toList().toString())
 
             fun inc(i: Int): Int = (i + 1).let {
                 println("generating $it")
@@ -269,14 +269,16 @@ class Ch9ExerciseTest {
             }
 
             val list = Stream
-                    .iterate(0, ::inc)
-                    .takeAtMost(60000)
-                    .dropAtMost(10000)
-                    .takeAtMost(10)
-                    .toList()
+                .iterate(0, ::inc)
+                .takeAtMost(60000)
+                .dropAtMost(10000)
+                .takeAtMost(10)
+                .toList()
 
-            assertEquals("[10000, 10001, 10002, 10003, 10004, 10005, 10006, 10007, 10008, 10009, NIL]",
-                    list.toString())
+            assertEquals(
+                "[10000, 10001, 10002, 10003, 10004, 10005, 10006, 10007, 10008, 10009, NIL]",
+                list.toString()
+            )
         }
     }
 
@@ -295,11 +297,12 @@ class Ch9ExerciseTest {
         @Test
         fun solve() {
             assertEquals(
-                    "[10, 11, NIL]",
-                    Stream.from(0)
-                            .dropWhile { it < 10 }
-                            .takeAtMost(2)
-                            .toList().toString())
+                "[10, 11, NIL]",
+                Stream.from(0)
+                    .dropWhile { it < 10 }
+                    .takeAtMost(2)
+                    .toList().toString()
+            )
         }
     }
 
@@ -309,10 +312,11 @@ class Ch9ExerciseTest {
         @Test
         fun solve() {
             assert(
-                    Stream.iterate(0) {
-                        println("evaluated: ${it + 1}")
-                        it + 1
-                    }.exists { it == 10 })
+                Stream.iterate(0) {
+                    println("evaluated: ${it + 1}")
+                    it + 1
+                }.exists { it == 10 }
+            )
         }
     }
 
@@ -321,7 +325,7 @@ class Ch9ExerciseTest {
 
         @Test
         fun solve() {
-            val sum = Stream.from(1).takeAtMost(10).foldRight(Lazy {0}) { elem ->
+            val sum = Stream.from(1).takeAtMost(10).foldRight(Lazy { 0 }) { elem ->
                 { acc ->
                     acc() + elem
                 }
@@ -331,14 +335,15 @@ class Ch9ExerciseTest {
         }
     }
 
-
     @Nested
     inner class Ex21 {
 
         @Test
         fun solve() {
-            assertEquals("[1, 2, 3, 4, NIL]",
-                    Stream.from(1).takeWhileViaFoldRight { it < 5 }.toList().toString())
+            assertEquals(
+                "[1, 2, 3, 4, NIL]",
+                Stream.from(1).takeWhileViaFoldRight { it < 5 }.toList().toString()
+            )
         }
     }
 
@@ -348,12 +353,14 @@ class Ch9ExerciseTest {
         @Test
         fun solve() {
             assertEquals(
-                    "Success(0)",
-                    Stream.from(0).headSafeViaFoldRight().toString())
+                "Success(0)",
+                Stream.from(0).headSafeViaFoldRight().toString()
+            )
 
             assertEquals(
-                    "Empty",
-                    Stream<Int>().headSafeViaFoldRight().toString())
+                "Empty",
+                Stream<Int>().headSafeViaFoldRight().toString()
+            )
         }
     }
 
@@ -406,8 +413,9 @@ class Ch9ExerciseTest {
             val s2 = Stream.from(4).takeAtMost(3)
 
             assertEquals(
-                    "[1, 2, 3, 4, 5, 6, NIL]",
-                    s1.append(Lazy { s2 }).toList().toString())
+                "[1, 2, 3, 4, 5, 6, NIL]",
+                s1.append(Lazy { s2 }).toList().toString()
+            )
         }
     }
 
@@ -416,11 +424,12 @@ class Ch9ExerciseTest {
 
         @Test
         fun solve() {
-            val f: (Int) -> Stream<Int> = { Stream.cons(Lazy {it}, Lazy { Stream() }) }
+            val f: (Int) -> Stream<Int> = { Stream.cons(Lazy { it }, Lazy { Stream() }) }
 
             assertEquals(
-                    "[1, 2, 3, NIL]",
-                    Stream.from(1).takeAtMost(3).flatMap(f).toList().toString())
+                "[1, 2, 3, NIL]",
+                Stream.from(1).takeAtMost(3).flatMap(f).toList().toString()
+            )
         }
     }
 
@@ -433,11 +442,12 @@ class Ch9ExerciseTest {
             var evaluated = 0
 
             assertEquals(
-                    "Success(3)",
-                    s.find {
-                        evaluated = it
-                        it == 3
-                    }.toString())
+                "Success(3)",
+                s.find {
+                    evaluated = it
+                    it == 3
+                }.toString()
+            )
 
             assertEquals(evaluated, 3)
 
@@ -466,15 +476,18 @@ class Ch9ExerciseTest {
         @Test
         fun solve() {
             assertEquals(
-                    "[1, 2, 3, NIL]",
-                    Stream.from(1).takeAtMost(3).toList().toString())
+                "[1, 2, 3, NIL]",
+                Stream.from(1).takeAtMost(3).toList().toString()
+            )
 
             fun fibs(): Stream<Int> = Stream.unfold(Pair(0, 1)) {
                 Result(Pair(it.second, Pair(it.second, it.first + it.second)))
             }
 
-            assertEquals("[1, 1, 2, 3, 5, 8, 13, 21, 34, 55, NIL]",
-                    fibs().takeAtMost(10).toList().toString())
+            assertEquals(
+                "[1, 1, 2, 3, 5, 8, 13, 21, 34, 55, NIL]",
+                fibs().takeAtMost(10).toList().toString()
+            )
         }
     }
 }

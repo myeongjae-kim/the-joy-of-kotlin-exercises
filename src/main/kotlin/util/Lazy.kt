@@ -1,6 +1,6 @@
 package util
 
-class Lazy <out A>(f: () -> A): () -> A {
+class Lazy <out A>(f: () -> A) : () -> A {
     private val value: A by lazy(f)
 
     override operator fun invoke(): A = value
@@ -11,11 +11,11 @@ class Lazy <out A>(f: () -> A): () -> A {
 
     companion object {
         fun <A, B, C> lift2(f: (A) -> (B) -> C): (Lazy<A>) -> (Lazy<B>) -> Lazy<C> =
-                { a ->
-                    { b ->
-                        Lazy { f(a())(b()) }
-                    }
+            { a ->
+                { b ->
+                    Lazy { f(a())(b()) }
                 }
+            }
 
         fun <A, B> map(a: Lazy<A>, f: (A) -> B): Lazy<B> = Lazy {
             f(a())
@@ -30,8 +30,5 @@ class Lazy <out A>(f: () -> A): () -> A {
         fun <A> sequenceResult(list: List<Lazy<A>>): Lazy<Result<List<A>>> = Lazy {
             Result.sequence(list.map { Result.of(it) })
         }
-
     }
 }
-
-

@@ -1,6 +1,6 @@
 package util
 
-sealed class Stream<out A>{
+sealed class Stream<out A> {
     abstract fun isEmpty(): Boolean
     abstract fun head(): Result<A>
     abstract fun tail(): Result<Stream<A>>
@@ -29,7 +29,7 @@ sealed class Stream<out A>{
     }
 
     fun filter(p: (A) -> Boolean): Stream<A> = dropWhile { !p(it) }.let { stream ->
-        when(stream) {
+        when (stream) {
             is Empty -> stream
             is Cons -> stream.head().map { a ->
                 cons(Lazy { a }, Lazy { stream.tl().filter(p) })
@@ -41,7 +41,7 @@ sealed class Stream<out A>{
         return this.foldRight(Lazy { Empty }) { elem: A ->
             { acc: Lazy<Stream<A>> ->
                 if (p(elem))
-                    cons(Lazy {elem}, acc)
+                    cons(Lazy { elem }, acc)
                 else
                     Empty
             }
@@ -53,15 +53,15 @@ sealed class Stream<out A>{
     }
 
     fun append(s: Lazy<Stream<@UnsafeVariance A>>): Stream<A> =
-            this.foldRight(s) { elem ->
-                { acc ->
-                    cons(Lazy {elem}, acc)
-                }
+        this.foldRight(s) { elem ->
+            { acc ->
+                cons(Lazy { elem }, acc)
             }
+        }
 
     fun find(p: (A) -> Boolean): Result<A> = filter(p).head()
 
-    private object Empty: Stream<Nothing>() {
+    private object Empty : Stream<Nothing>() {
         override fun head(): Result<Nothing> = Result()
         override fun tail(): Result<Nothing> = Result()
         override fun isEmpty(): Boolean = true
@@ -73,13 +73,13 @@ sealed class Stream<out A>{
         override fun takeWhile(p: (Nothing) -> Boolean): Stream<Nothing> = this
         override fun dropWhile(p: (Nothing) -> Boolean): Stream<Nothing> = this
 
-        override fun <B> foldRight(identity: Lazy<B>, f: (Nothing) -> (Lazy<B>) -> B): B  = identity()
+        override fun <B> foldRight(identity: Lazy<B>, f: (Nothing) -> (Lazy<B>) -> B): B = identity()
     }
 
     private class Cons<out A>(
-            val hd: Lazy<A>,
-            val tl: Lazy<Stream<A>>
-    ): Stream<A>() {
+        val hd: Lazy<A>,
+        val tl: Lazy<Stream<A>>
+    ) : Stream<A>() {
         override fun head(): Result<A> = Result(hd())
         override fun tail(): Result<Stream<A>> = Result(tl())
         override fun isEmpty(): Boolean = false
@@ -87,7 +87,7 @@ sealed class Stream<out A>{
         override fun takeAtMost(n: Int): Stream<A> = if (n <= 0) {
             Empty
         } else {
-            Cons(hd, Lazy { tl().takeAtMost(n - 1)} )
+            Cons(hd, Lazy { tl().takeAtMost(n - 1) })
         }
 
         override fun dropAtMost(n: Int): Stream<A> = dropAtMost(n, this)
@@ -95,21 +95,21 @@ sealed class Stream<out A>{
         override fun toList(): List<out A> = toList(this)
 
         override fun takeWhile(p: (A) -> Boolean): Stream<A> =
-                if (p(hd()))
-                    cons(hd, Lazy{ tl().takeWhile(p) })
-                else
-                    Empty
+            if (p(hd()))
+                cons(hd, Lazy { tl().takeWhile(p) })
+            else
+                Empty
 
         override fun dropWhile(p: (A) -> Boolean): Stream<A> = dropWhile(this, p)
 
         override fun <B> foldRight(identity: Lazy<B>, f: (A) -> (Lazy<B>) -> B): B =
-                f(this.hd())(Lazy { this.tl().foldRight(identity, f) })
+            f(this.hd())(Lazy { this.tl().foldRight(identity, f) })
     }
 
     companion object {
         fun <A> cons(
-                hd: Lazy<A>,
-                tl: Lazy<Stream<A>>
+            hd: Lazy<A>,
+            tl: Lazy<Stream<A>>
         ): Stream<A> = Cons(hd, tl)
 
         operator fun <A> invoke(): Stream<A> = Empty
@@ -150,8 +150,8 @@ sealed class Stream<out A>{
         }
 
         fun <A, S> unfold(z: S, f: (S) -> Result<Pair<A, S>>): Stream<A> =
-                f(z)
-                        .map { (a, s) -> cons(Lazy { a }, Lazy{ unfold(s, f) }) }
-                        .getOrElse(Empty)
+            f(z)
+                .map { (a, s) -> cons(Lazy { a }, Lazy { unfold(s, f) }) }
+                .getOrElse(Empty)
     }
 }

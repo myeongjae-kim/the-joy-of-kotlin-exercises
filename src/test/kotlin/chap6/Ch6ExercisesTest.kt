@@ -1,9 +1,9 @@
 package chap6
 
-import util.List
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import util.List
 import util.Option
 import java.lang.RuntimeException
 import kotlin.math.pow
@@ -158,18 +158,18 @@ class Ch6ExercisesTest {
         oa.flatMap { a -> ob.map { b -> f(a)(b) } }
 
     fun <A, B, C, D> map3(
-            oa: Option<A>,
-            ob: Option<B>,
-            oc: Option<C>,
-            f: (A) -> (B) -> (C) -> D
+        oa: Option<A>,
+        ob: Option<B>,
+        oc: Option<C>,
+        f: (A) -> (B) -> (C) -> D
     ): Option<D> = oa.flatMap { a -> ob.flatMap { b -> oc.map { c -> f(a)(b)(c) } } }
 
     fun <A, B, C, D, E> map4(
-            oa: Option<A>,
-            ob: Option<B>,
-            oc: Option<C>,
-            od: Option<D>,
-            f: (A) -> (B) -> (C) -> (D) -> E
+        oa: Option<A>,
+        ob: Option<B>,
+        oc: Option<C>,
+        od: Option<D>,
+        f: (A) -> (B) -> (C) -> (D) -> E
     ): Option<E> = oa.flatMap { a -> ob.flatMap { b -> oc.flatMap { c -> od.map { d -> f(a)(b)(c)(d) } } } }
 
     @Nested
