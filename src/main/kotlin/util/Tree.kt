@@ -13,6 +13,15 @@ sealed class Tree<out A : Comparable<@kotlin.UnsafeVariance A>> {
         }
     }
 
+    fun contains(a: @UnsafeVariance A): Boolean = when (this) {
+        Empty -> false
+        is T -> when {
+            a < this.value -> left.contains(a)
+            a > this.value -> right.contains(a)
+            else -> true
+        }
+    }
+
     internal object Empty : Tree<Nothing> () {
 
         override fun isEmpty(): Boolean = true
