@@ -71,4 +71,22 @@ class Ch10ExerciseTest {
             assertEquals(2, tree2.height)
         }
     }
+
+    @Nested
+    inner class Ex05 {
+
+        @Test
+        fun solve() {
+            val tree1 = Tree(List(3, 1, 2))
+            assertEquals("Success(3)", tree1.max().toString())
+            assertEquals("Success(1)", tree1.min().toString())
+
+            val tree2 = Tree(List(2, 1, 3))
+            assertEquals("Success(3)", tree2.max().toString())
+            assertEquals("Success(1)", tree2.min().toString())
+
+            assertEquals("Empty", Tree<Int>().max().toString())
+            assertEquals("Empty", Tree<Int>().min().toString())
+        }
+    }
 }
