@@ -56,4 +56,19 @@ class Ch10ExerciseTest {
             assert(!tree.contains(4))
         }
     }
+
+    @Nested
+    inner class Ex04 {
+
+        @Test
+        fun solve() {
+            val tree1 = Tree(List(3, 1, 2))
+            assertEquals(3, tree1.size)
+            assertEquals(1, tree1.height)
+
+            val tree2 = Tree(List(2, 1, 3))
+            assertEquals(3, tree2.size)
+            assertEquals(2, tree2.height)
+        }
+    }
 }
